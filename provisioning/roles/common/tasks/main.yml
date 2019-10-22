@@ -1,0 +1,55 @@
+---
+- name: Install epel-release
+  yum:
+    name: epel-release
+    state: present
+
+- name: Install base packages
+  yum:
+    name: "{{ packages }}"
+    state: present
+    update_cache: "yes"
+  vars:
+    packages:
+      - vim-enhanced
+      - nmap
+      - nmap-ncat
+      - tree
+      - curl
+      - yum-utils
+      - device-mapper-persistent-data
+      - lvm2
+
+
+- name: Add yum repository for Docker stable
+  yum_repository:
+    name: docker-ce-stable
+    description: Docker CE Stable - $basearch
+    baseurl: https://download.docker.com/linux/centos/$releasever/$basearch/stable/
+    gpgcheck: "yes"
+    gpgkey: https://download.docker.com/linux/centos/gpg
+    state: present
+    enabled: "no"
+
+- name: Install docker
+  yum:
+    name: "{{ packages }}"
+    state: present
+    enablerepo: docker-ce-stable
+  vars:
+    packages:
+      - docker-ce-18.06.1.ce
+  notify:
+    - docker status
+
+
+- name: Start service docker, if not started
+  service:
+    name: docker
+    state: restarted
+    enabled: "yes"
+
+- name: Add vagrant user to docker group
+  user:
+    name: vagrant
+    group: docker

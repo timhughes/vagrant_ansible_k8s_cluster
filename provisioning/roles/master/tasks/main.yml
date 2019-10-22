@@ -1,0 +1,53 @@
+---
+- name: Check if kubeadm has already run
+  stat:
+    path: "/var/lib/kubelet/config.yaml"
+  register: kubeadm_already_run
+
+
+- name: Initialize the Kubernetes cluster using kubeadm
+  command: kubeadm init --pod-network-cidr=192.168.0.0/16
+  when:
+    - not kubeadm_already_run.stat.exists
+
+
+- name: Check if vagrant user has ~/.kube/conf
+  stat:
+    path: "/home/vagrant/.kube/config"
+  register: vagrant_kube_conf
+
+
+- name: Setup kubeconfig for vagrant user
+  command: "{{ item }}"
+  with_items:
+    - mkdir -p /home/vagrant/.kube
+    - cp -i /etc/kubernetes/admin.conf /home/vagrant/.kube/config
+    - chown vagrant:vagrant /home/vagrant/.kube/config
+  when:
+    - not vagrant_kube_conf.stat.exists
+
+- name: Check if calico kubeconfig exists
+  stat:
+    path: "/etc/cni/net.d/calico-kubeconfig"
+  register: calico_kubeconfig
+
+
+- name: Install calico pod network
+  become: false
+  command: kubectl create -f https://docs.projectcalico.org/v3.8/manifests/calico.yaml
+  when:
+    - not calico_kubeconfig.stat.exists
+
+
+- name: Generate join command
+  command: kubeadm token create --print-join-command
+  become: false
+  register: join_command
+
+- name: Copy join command to local file
+  become: false
+  local_action:
+    module: copy
+    content: "{{ join_command.stdout_lines[0] }}"
+    dest: "./join-command"
+

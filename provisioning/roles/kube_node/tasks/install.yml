@@ -1,0 +1,30 @@
+---
+- name: Add yum repository for Kubernetes stable
+  yum_repository:
+    name: kubernetes
+    description: Kubernetes - $basearch
+    baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el$releasever-$basearch
+    gpgcheck: "yes"
+    enabled: "yes"
+    gpgkey: "https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg"
+    exclude: kube*
+    state: present
+
+- name: Install Kubernetes
+  yum:
+    name: "{{ packages }}"
+    state: present
+    disable_excludes: kubernetes
+  vars:
+    packages:
+      - kubelet
+      - kubeadm
+      - kubectl
+  notify:
+    - kubelet status
+
+- name: Restart kubelet
+  service:
+    name: kubelet
+    daemon_reload: "yes"
+    state: restarted
