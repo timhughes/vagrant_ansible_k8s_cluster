@@ -46,7 +46,7 @@
 - name: Start service docker, if not started
   service:
     name: docker
-    state: restarted
+    state: started
     enabled: "yes"
 
 - name: Add vagrant user to docker group

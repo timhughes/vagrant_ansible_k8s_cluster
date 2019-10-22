@@ -26,15 +26,26 @@ Vagrant.configure("2") do |config|
     {role: 'worker', qty: 3},
   ]
 
+  ansible_groups = {}
   node_configs.each do |node_conf|
     (1..(node_conf[:qty])).each do |i|
       id = i.to_s.rjust(2, '0')
       config.vm.define "#{node_conf[:role]}-#{id}" do |node|
-        node.vm.hostname = "#{node_conf[:role]}-#{id}"
-        node.vm.provision "ansible" do |ansible|
-          ansible.playbook = "provisioning/#{node_conf[:role]}-playbook.yml"
+        hostname = "#{node_conf[:role]}-#{id}"
+        if ansible_groups.key?(node_conf[:role])
+          ansible_groups[node_conf[:role]] << hostname
+        else
+          ansible_groups[node_conf[:role]] = [hostname]
         end
+        node.vm.hostname = hostname
       end
+
     end
   end
+  config.vm.provision "ansible" do |ansible|
+    ansible.playbook = "provisioning/playbook.yml"
+    ansible.groups = ansible_groups
+  end
+
+
 end

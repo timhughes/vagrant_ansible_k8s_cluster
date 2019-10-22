@@ -1,0 +1,14 @@
+---
+- hosts: all
+  become: true
+  roles:
+    - common
+    - kube_node
+- hosts: master
+  become: true
+  roles:
+    - master
+- hosts: worker
+  become: true
+  roles:
+    - worker
