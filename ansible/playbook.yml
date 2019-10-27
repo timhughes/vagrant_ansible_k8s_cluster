@@ -3,6 +3,7 @@
   become: true
   roles:
     - common
+    - docker
     - kube_node
 - hosts: master
   become: true

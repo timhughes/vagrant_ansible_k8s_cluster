@@ -38,12 +38,13 @@ Vagrant.configure("2") do |config|
           ansible_groups[node_conf[:role]] = [hostname]
         end
         node.vm.hostname = hostname
+        node.vm.provision "shell", inline: 'sed -i "/$HOSTNAME/d" /etc/hosts'
       end
 
     end
   end
   config.vm.provision "ansible" do |ansible|
-    ansible.playbook = "provisioning/playbook.yml"
+    ansible.playbook = "ansible/playbook.yml"
     ansible.groups = ansible_groups
   end
 

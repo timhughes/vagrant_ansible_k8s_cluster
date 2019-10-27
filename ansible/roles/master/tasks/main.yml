@@ -6,7 +6,7 @@
 
 
 - name: Initialize the Kubernetes cluster using kubeadm
-  command: kubeadm init --pod-network-cidr=192.168.0.0/16
+  command: kubeadm init --pod-network-cidr={{ pod_network_cidr }}
   when:
     - not kubeadm_already_run.stat.exists
 
@@ -31,13 +31,17 @@
     path: "/etc/cni/net.d/calico-kubeconfig"
   register: calico_kubeconfig
 
+- name: Create calico manifest
+  become: false
+  template:
+    src: calico.yaml.j2
+    dest: /tmp/calico.yaml
 
 - name: Install calico pod network
   become: false
-  command: kubectl create -f https://docs.projectcalico.org/v3.8/manifests/calico.yaml
+  command: kubectl create -f /tmp/calico.yaml
   when:
     - not calico_kubeconfig.stat.exists
-
 
 - name: Generate join command
   command: kubeadm token create --print-join-command
@@ -50,4 +54,3 @@
     module: copy
     content: "{{ join_command.stdout_lines[0] }}"
     dest: "./join-command"
-

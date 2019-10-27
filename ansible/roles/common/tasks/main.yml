@@ -1,0 +1,23 @@
+---
+- name: Install epel-release
+  yum:
+    name: epel-release
+    state: present
+
+- name: Install base packages
+  yum:
+    name: "{{ packages }}"
+    state: present
+    update_cache: "yes"
+  vars:
+    packages:
+      - vim-enhanced
+      - nmap
+      - nmap-ncat
+      - tree
+      - curl
+      - yum-utils
+      - device-mapper-persistent-data
+      - lvm2
+
+

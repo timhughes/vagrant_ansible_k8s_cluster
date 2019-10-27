@@ -1,25 +1,15 @@
 ---
-- name: Install epel-release
-  yum:
-    name: epel-release
-    state: present
+# https://kubernetes.io/docs/setup/production-environment/container-runtimes/#docker
 
-- name: Install base packages
+- name: Install required packages.
   yum:
     name: "{{ packages }}"
     state: present
     update_cache: "yes"
   vars:
     packages:
-      - vim-enhanced
-      - nmap
-      - nmap-ncat
-      - tree
-      - curl
-      - yum-utils
       - device-mapper-persistent-data
       - lvm2
-
 
 - name: Add yum repository for Docker stable
   yum_repository:
@@ -43,9 +33,35 @@
     - docker status
 
 
+- name: Create docker etc directory
+  file:
+    path: /etc/docker
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Copy in docker daemon settings
+  copy:
+    src: daemon.json
+    dest: /etc/docker/daemon.json
+    owner: root
+    group: root
+    mode: '0644'
+
+
+- name: Create docker systemd overrides directory
+  file:
+    path: /etc/systemd/system/docker.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
 - name: Start service docker, if not started
   service:
     name: docker
+    daemon_reload: "yes"
     state: started
     enabled: "yes"
 
