@@ -3,9 +3,9 @@
 
 ## Setup
 
-Vagrant does most of the setup here. It uses an Ansible provisioner to get a
-very basic install following the instructions from official docs starting at
-[Installing kubeadm] and going as far as [Creating a single control-plane
+Vagrant does most of the initial setup here. It uses an Ansible provisioner to 
+get a very basic install following the instructions from official docs starting
+at [Installing kubeadm] and going as far as [Creating a single control-plane
 cluster with kubeadm]. It uses the [Docker Container Runtime Interface] (CRI)
 and the [Calico Container Network Interface] (CNI)
 
