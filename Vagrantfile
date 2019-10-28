@@ -26,7 +26,15 @@ Vagrant.configure("2") do |config|
     {role: 'worker', qty: 3},
   ]
 
+
   ansible_groups = {}
+
+  config.vm.network "private_network",
+      type: 'dhcp',
+      libvirt__network_name: 'metallb',
+      libvirt__network_address: '172.28.128.0',
+      libvirt__dhcp_last: '172.28.128.100' # keep the rest for the load balancer
+
   node_configs.each do |node_conf|
     (1..(node_conf[:qty])).each do |i|
       id = i.to_s.rjust(2, '0')
@@ -38,7 +46,10 @@ Vagrant.configure("2") do |config|
           ansible_groups[node_conf[:role]] = [hostname]
         end
         node.vm.hostname = hostname
+
+
         node.vm.provision "shell", inline: 'sed -i "/$HOSTNAME/d" /etc/hosts'
+
       end
 
     end

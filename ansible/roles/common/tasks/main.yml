@@ -19,5 +19,9 @@
       - yum-utils
       - device-mapper-persistent-data
       - lvm2
+      - git
 
-
+- name: upgrade all packages
+  yum:
+    name: '*'
+    state: latest

@@ -21,7 +21,8 @@
   command: "{{ item }}"
   with_items:
     - mkdir -p /home/vagrant/.kube
-    - cp -i /etc/kubernetes/admin.conf /home/vagrant/.kube/config
+    - /bin/cp /etc/kubernetes/admin.conf /home/vagrant/.kube/config
+    - /bin/cp /etc/kubernetes/admin.conf /vagrant/tmp/kubeadmin.conf
     - chown vagrant:vagrant /home/vagrant/.kube/config
   when:
     - not vagrant_kube_conf.stat.exists
