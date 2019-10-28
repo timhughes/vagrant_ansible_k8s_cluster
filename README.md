@@ -253,5 +253,21 @@ Next apply it using kubectl
      kubectl apply -f tmp/metallb_address-pool.yaml
 
 
+Hopefully if everything has gone to plan the wordpress service should now have
+an exteral IP address that can be accessed from your workstation.
+
+You can check this by getting the services:
+
+    $ kubectl get services -o wide
+    NAME              TYPE           CLUSTER-IP    EXTERNAL-IP      PORT(S)        AGE    SELECTOR
+    kubernetes        ClusterIP      10.96.0.1     <none>           443/TCP        121m   <none>
+    wordpress         LoadBalancer   10.98.86.15   172.28.128.101   80:30910/TCP   34m    app=wordpress,tier=frontend
+    wordpress-mysql   ClusterIP      None          <none>           3306/TCP       92m    app=wordpress,tier=mysql
+
+
+In this instance NAT has been used but it should be possible to use macvtap to
+make this accessable from other machines in the network.
+
+
 [MetalLB]: https://metallb.universe.tf
 [MetalLB compatibility docs]: https://metallb.universe.tf/installation/
