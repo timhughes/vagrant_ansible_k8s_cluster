@@ -246,7 +246,7 @@ will respond to arp requests and do this all at layer2.
         - name: default
           protocol: layer2
           addresses:
-          - 172.28.128.50-172.28.128.250
+          - 192.168.200.100-192.168.200.250
 
 Next apply it using kubectl
 

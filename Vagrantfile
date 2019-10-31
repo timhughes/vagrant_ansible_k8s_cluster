@@ -5,6 +5,16 @@
 # configures the configuration version (we support older styles for
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
+
+node_configs = [
+  {role: 'master', qty: 1 },
+  {role: 'worker', qty: 3},
+]
+
+# Max instances per role. Used for spacing ip addresses
+role_spacer = 10
+
+
 Vagrant.configure("2") do |config|
   # The most common configuration options are documented and commented below.
   # For a complete reference, please see the online documentation at
@@ -15,30 +25,22 @@ Vagrant.configure("2") do |config|
 
   config.vm.provider :libvirt do |libvirt|
     libvirt.cpus = 2
-    libvirt.memory = 2048
+    libvirt.memory = 4096
     libvirt.nested = true
     libvirt.graphics_type = 'spice'
     libvirt.video_type = 'virtio'
-
   end
-  node_configs = [
-    {role: 'master', qty: 1},
-    {role: 'worker', qty: 3},
-  ]
-
 
   ansible_groups = {}
 
-  #config.vm.network "private_network",
-  #    type: 'dhcp',
-  #    libvirt__network_name: 'metallb',
-  #    libvirt__network_address: '172.28.128.0',
-  #    libvirt__dhcp_last: '172.28.128.100' # keep the rest for the load balancer
-
-  j = 10
-  node_configs.each do |node_conf|
-    (1..(node_conf[:qty])).each do |i|
-      id = i.to_s.rjust(2, '0')
+  node_configs.each_with_index  do |node_conf, i|
+    role_num = i+1 # dont want multiply by zero later
+    if node_conf[:qty] > role_spacer
+      puts "ERROR: Role #{node_conf[:role]} has 'qty' of  #{node_conf[:qty]} greater than #{role_spacer} (role_spacer)"
+      abort
+    end
+    (1..(node_conf[:qty])).each do |node_num|
+      id = role_spacer*role_num+node_num
       config.vm.define "#{node_conf[:role]}-#{id}" do |node|
         hostname = "#{node_conf[:role]}-#{id}"
         if ansible_groups.key?(node_conf[:role])
@@ -47,16 +49,13 @@ Vagrant.configure("2") do |config|
           ansible_groups[node_conf[:role]] = [hostname]
         end
         node.vm.hostname = hostname
-        node.vm.network "private_network", ip: "192.168.200.#{j+id}"
+        node.vm.network "private_network", ip: "192.168.200.#{id}"
         node.vm.provision "shell", inline: 'sed -i "/$HOSTNAME/d" /etc/hosts'
       end
     end
-    j += 10
   end
   config.vm.provision "ansible" do |ansible|
     ansible.playbook = "ansible/playbook.yml"
     ansible.groups = ansible_groups
   end
-
-
 end
