@@ -3,7 +3,7 @@
 
 ## Setup
 
-Vagrant does most of the initial setup here. It uses an Ansible provisioner to 
+Vagrant does most of the initial setup here. It uses an Ansible provisioner to
 get a very basic install following the instructions from official docs starting
 at [Installing kubeadm] and going as far as [Creating a single control-plane
 cluster with kubeadm]. It uses the [Docker Container Runtime Interface] (CRI)
@@ -28,11 +28,12 @@ re-provision using vagrant.
     vagrant provision
 
 When all is complete there should be a `kubeadmin.conf` file in the same
-directory as the `Vagrantfile`.  This is the authentication config for `kubectl`
+directory as the `Vagrantfile`.  This is the authentication config for
+`kubectl`:
 
     export KUBECONFIG=${PWD}/tmp/kubeadmin.conf
 
-Next see how the kubernetes cluster is running
+Next see how the kubernetes cluster is running:
 
     kubectl get nodes
     kubectl get all --all-namespaces
