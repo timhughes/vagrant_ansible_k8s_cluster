@@ -65,6 +65,28 @@ The output should look similar this with 1 test passed and a lot of skipped:
     Skipped: 4896
 
 ## Monitoring
+
+
+### Installing the Metrics Server
+
+Metrics Server is a cluster-wide aggregator of resource usage data.
+
+[Metrics Server]: https://github.com/kubernetes-incubator/metrics-server/
+
+To install the metrics server, clone the git repo and then checkout the latest
+revision. To list the available revisions use `git tag -l`.
+
+    git clone https://github.com/kubernetes-incubator/metrics-server ./tmp/metrics-server
+    cd ./tmp/metrics-server
+    git checkout v0.3.6
+
+Once the correct revision is checked out you can create the server in kubernetes
+with the following command:
+
+    kubectl create -f deploy/1.8+/
+
+
+
 ### Deploying the Dashboard.
 
 The dashboard is a pretty interface with some monitoring in it.
@@ -208,6 +230,8 @@ You may have notices with the WordPress example that the EXTERNAL-IP of the
 to use a load-balancer. The next section will cover creating a load balancer.
 
 
+## Connecting from the outside
+
 ### Creating the LoadBalancer
 
 Kubernetes doesn't supply a LoadBalancer for clusters that aren't running on
@@ -272,3 +296,5 @@ make this accessable from other machines in the network.
 
 [MetalLB]: https://metallb.universe.tf
 [MetalLB compatibility docs]: https://metallb.universe.tf/installation/
+
+
