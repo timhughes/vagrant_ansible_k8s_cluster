@@ -229,11 +229,15 @@ Once you are done you can delete the toolbox:
 ### Creating Ceph block devices
 
 The following will create a `rook-ceph-block` StorageClass which can be used by
-applications.
+applications. These will be ext4 by default so if you want to change it then download the yamls and edit before creating. 
 
-    wget -O ./tmp/storageclass.yaml https://raw.githubusercontent.com/rook/rook/release-1.2/cluster/examples/kubernetes/ceph/csi/rbd/storageclass.yaml
-    sed -i 's|csi.storage.k8s.io/fstype: ext4|csi.storage.k8s.io/fstype: xfs|g' ./tmp/storageclass.yaml
-    kubectl create -f ./tmp/storageclass.yaml
+There are 2 different yamls available at https://github.com/rook/rook/tree/release-1.2/cluster/examples/kubernetes/ceph/csi/rbd `storageclass.yaml` which requres 3 replicas and `storageclass-test.yaml` which is designed for testing on a single node. Pick one and create it.
+
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.2/cluster/examples/kubernetes/ceph/csi/rbd/storageclass-test.yaml
+    
+or
+
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.2/cluster/examples/kubernetes/ceph/csi/rbd/storageclass.yaml
 
 
 Some sample apps are provided with rook for testing.
