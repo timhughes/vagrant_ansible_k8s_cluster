@@ -113,8 +113,8 @@ The main instructions are
 
 Create a user and make it a member of the role cluster-admin (You should use something more secure in production).
 
-    kubectl create -n kubernetes-dashboard serviceaccount dashboard-admin-sa
-    kubectl create -n kubernetes-dashboard clusterrolebinding dashboard-admin-sa --clusterrole=cluster-admin --serviceaccount=default:dashboard-admin-sa
+    kubectl create serviceaccount -n kubernetes-dashboard dashboard-admin-sa 
+    kubectl create clusterrolebinding dashboard-admin-sa --clusterrole=cluster-admin --serviceaccount=kubernetes-dashboard:dashboard-admin-sa 
 
 Get the secret token to access the dashboard which is required to log into the dashboard.
     
