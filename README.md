@@ -95,8 +95,14 @@ The main instructions are
 [here](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/)
 
     kubectl apply -f kubernetes/dashboard.yaml
-    kubectl apply -f kubernetes/dashboard-adminuser.yaml
 
+Create a user and make it a member of the role cluster-admin (You should use something more secure in production).
+
+    kubectl create clusterrolebinding dashboard-admin-sa
+    kubectl create clusterrolebinding dashboard-admin-sa --clusterrole=cluster-admin --serviceaccount=default:dashboard-admin-sa
+
+Get the secret to access the dashboard.
+    
     kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret | grep admin-user | awk '{print $1}')
 
 Kubectl has a proxy in it to make accessing the web interface of the cluster
