@@ -181,6 +181,9 @@ The TL;DR for the rook quickstart is the following commands:
     kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.1/cluster/examples/kubernetes/ceph/operator.yaml
     kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.1/cluster/examples/kubernetes/ceph/cluster-test.yaml
 
+These take a little while to get bootstrapped. You can check the state of the pods using:
+
+    kubectl  get all -n rook-ceph
 
 Once the Ceph cluster is running you can access it using the `kubectl proxy`:
 
@@ -189,7 +192,9 @@ Once the Ceph cluster is running you can access it using the `kubectl proxy`:
 This is an example of application not working correctly using the proxy due to the way the Ceph
 Dashboard redirects on login we should use the port-forward method instead
 
-- `kubectl --namespace rook-ceph port-forward service/alertmanager-main 9093` http://127.0.0.1:9093
+    kubectl --namespace rook-ceph port-forward service/rook-ceph-mgr-dashboard 8443
+    
+- http://127.0.0.1:8443
 
 The default username is `admin` and the password is randomly generated and stored in
 Kubernetes. It can be extracted using the following:
