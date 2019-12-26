@@ -79,28 +79,7 @@ The output should look similar this with 1 test passed and a lot of skipped:
     Failed: 0
     Skipped: 4896
 
-## Monitoring
-
-
-### Installing the Metrics Server
-
-Metrics Server is a cluster-wide aggregator of resource usage data.
-
-[Metrics Server]: https://github.com/kubernetes-incubator/metrics-server/
-
-To install the metrics server, clone the git repo and then checkout the latest
-revision. To list the available revisions use `git tag -l`.
-
-    git clone https://github.com/kubernetes-incubator/metrics-server ./tmp/metrics-server
-    cd ./tmp/metrics-server
-    git checkout v0.3.6
-
-Once the correct revision is checked out you can create the server in kubernetes
-with the following command:
-
-    kubectl create -f deploy/1.8+/
-
-
+## Management
 
 ### Deploying the Dashboard.
 
@@ -128,6 +107,64 @@ accessed in this way.
 
 - http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
 
+The second way is to create a port forward. This way often works best as the application may be using redirects that break using `kubectl proxy`. This command requires the node to have 'socat' installed.
+
+    kubectl --namespace kubernetes-dashboard port-forward svc/kubernetes-dashboard 8443:443
+    
+- https://127.0.0.1:8443/
+    
+    
+
+## Monitoring
+The original application for this was named **heapster** but it has now been deprecated. This is being replaced by a new service named **metrics-server** but like all things in k8s this is interchangable with other solutions such as **prometheus**.
+
+Provided below are installation instructions for both **metrics-server** and **Prometheus**. You can only choose one.
+
+### Prometheus
+
+[Prometheus]: https://prometheus.io/
+[kube-prometheus]: https://github.com/coreos/kube-prometheus
+
+The kube-prometheus project makes prometheus run nativly on kubernetes.  
+These instructions are based on the quickstart from the kube-prometheus README which you should read for further details.
+
+Download and install kube-prometheus
+
+    git clone https://github.com/coreos/kube-prometheus tmp/kube-prometheus
+    kubectl create -f tmp/kube-prometheus/manifests/setup
+    until kubectl get servicemonitors --all-namespaces ; do date; sleep 1; echo ""; done
+    kubectl create -f tmp/kube-prometheus/manifests/
+    
+You can then access it from you local machine using a portforward 
+
+    kubectl --namespace monitoring port-forward svc/prometheus-k8s 9090
+    
+Open you browser to http://127.0.0.1:9090
+
+You can access the rest of the services in a similar way.
+
+- `kubectl --namespace monitoring port-forward svc/grafana 3000` http://127.0.0.1:3000
+- `kubectl --namespace monitoring port-forward service/alertmanager-main 9093` http://127.0.0.1:9093
+
+### Metrics Server. 
+
+Metrics Server is a cluster-wide aggregator of resource usage data.
+
+[Metrics Server]: https://github.com/kubernetes-sigs/metrics-server
+
+To install the metrics server, clone the git repo and then checkout the latest
+revision. To list the available revisions use `git tag -l`.
+
+    git clone https://github.com/kubernetes-sigs/metrics-server ./tmp/metrics-server
+    cd ./tmp/metrics-server
+    git checkout v0.3.6
+
+Once the correct revision is checked out you can create the server in kubernetes
+with the following command:
+
+    kubectl create -f deploy/1.8+/
+
+
 
 ## Storage
 ### Deloying a Rook Ceph cluster
@@ -140,35 +177,24 @@ to kubernetes.
 The TL;DR for the rook quickstart is the following commands:
 
 
-    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.1/cluster/examples/kubernetes/ceph/common.yaml
-    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.1/cluster/examples/kubernetes/ceph/operator.yaml
-    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.1/cluster/examples/kubernetes/ceph/cluster-test.yaml
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.2/cluster/examples/kubernetes/ceph/common.yaml
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.2/cluster/examples/kubernetes/ceph/operator.yaml
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.2/cluster/examples/kubernetes/ceph/cluster-test.yaml
 
+These take a little while to get bootstrapped. You can check the state of the pods using:
+
+    kubectl  get all -n rook-ceph
 
 Once the Ceph cluster is running you can access it using the `kubectl proxy`:
 
 - http://localhost:8001/api/v1/namespaces/rook-ceph/services/https:rook-ceph-mgr-dashboard:8443/proxy/
 
-I don't think you can log in correctly using the proxy due to the way the Ceph
-Dashboard redirects on login so we can set it up with a
-NodePort which is just a port-forward from the external interface of the
-Kubernetes nodes to the service.
+This is an example of application not working correctly using the proxy due to the way the Ceph
+Dashboard redirects on login we should use the port-forward method instead
 
-    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.1/cluster/examples/kubernetes/ceph/dashboard-external-https.yaml
-
-You can then find the port using the following command. The port you want is the
-one after `8443:` and is probably a high number:
-
-    kubectl -n rook-ceph get service rook-ceph-mgr-dashboard-external-https
-
-This port on all the kubernetes nodes will be forwarded to your service so we
-can grab any external ip in the cluster. This command will show you all the IP
-addresses available.
-
-    kubectl -n rook-ceph get nodes -o wide
-
-So combine the ip address and port and using https you should get a url similar
-to https://192.168.121.53:31158
+    kubectl --namespace rook-ceph port-forward service/rook-ceph-mgr-dashboard 8443
+    
+- http://127.0.0.1:8443
 
 The default username is `admin` and the password is randomly generated and stored in
 Kubernetes. It can be extracted using the following:
@@ -184,7 +210,7 @@ Remember to change to the page that matches the version you have installed.
 
 Here is a TL;DR for rook-ceph-toolbox:
 
-    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.1/cluster/examples/kubernetes/ceph/toolbox.yaml
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.2/cluster/examples/kubernetes/ceph/toolbox.yaml
     kubectl -n rook-ceph get pod -l "app=rook-ceph-tools"
     kubectl -n rook-ceph exec -it $(kubectl -n rook-ceph get pod -l "app=rook-ceph-tools" -o jsonpath='{.items[0].metadata.name}') bash
 
@@ -203,17 +229,21 @@ Once you are done you can delete the toolbox:
 ### Creating Ceph block devices
 
 The following will create a `rook-ceph-block` StorageClass which can be used by
-applications.
+applications. These will be ext4 by default so if you want to change it then download the yamls and edit before creating. 
 
-    wget -O ./tmp/storageclass.yaml https://raw.githubusercontent.com/rook/rook/release-1.1/cluster/examples/kubernetes/ceph/csi/rbd/storageclass.yaml
-    sed -i 's|csi.storage.k8s.io/fstype: ext4|csi.storage.k8s.io/fstype: xfs|g' ./tmp/storageclass.yaml
-    kubectl create -f ./tmp/storageclass.yaml
+There are 2 different yamls available at https://github.com/rook/rook/tree/release-1.2/cluster/examples/kubernetes/ceph/csi/rbd `storageclass.yaml` which requres 3 replicas and `storageclass-test.yaml` which is designed for testing on a single node. Pick one and create it.
+
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.2/cluster/examples/kubernetes/ceph/csi/rbd/storageclass-test.yaml
+    
+or
+
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.2/cluster/examples/kubernetes/ceph/csi/rbd/storageclass.yaml
 
 
 Some sample apps are provided with rook for testing.
 
-    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.1/cluster/examples/kubernetes/mysql.yaml
-    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.1/cluster/examples/kubernetes/wordpress.yaml
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.2/cluster/examples/kubernetes/mysql.yaml
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.2/cluster/examples/kubernetes/wordpress.yaml
 
 
 You can see the state of the apps using `kubectl get all` as these will be
@@ -317,5 +347,6 @@ make this accessable from other machines in the network.
 
 [MetalLB]: https://metallb.universe.tf
 [MetalLB compatibility docs]: https://metallb.universe.tf/installation/
+
 
 
