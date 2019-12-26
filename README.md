@@ -177,9 +177,9 @@ to kubernetes.
 The TL;DR for the rook quickstart is the following commands:
 
 
-    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.1/cluster/examples/kubernetes/ceph/common.yaml
-    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.1/cluster/examples/kubernetes/ceph/operator.yaml
-    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.1/cluster/examples/kubernetes/ceph/cluster-test.yaml
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.2/cluster/examples/kubernetes/ceph/common.yaml
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.2/cluster/examples/kubernetes/ceph/operator.yaml
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.2/cluster/examples/kubernetes/ceph/cluster-test.yaml
 
 These take a little while to get bootstrapped. You can check the state of the pods using:
 
@@ -210,7 +210,7 @@ Remember to change to the page that matches the version you have installed.
 
 Here is a TL;DR for rook-ceph-toolbox:
 
-    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.1/cluster/examples/kubernetes/ceph/toolbox.yaml
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.2/cluster/examples/kubernetes/ceph/toolbox.yaml
     kubectl -n rook-ceph get pod -l "app=rook-ceph-tools"
     kubectl -n rook-ceph exec -it $(kubectl -n rook-ceph get pod -l "app=rook-ceph-tools" -o jsonpath='{.items[0].metadata.name}') bash
 
@@ -231,15 +231,15 @@ Once you are done you can delete the toolbox:
 The following will create a `rook-ceph-block` StorageClass which can be used by
 applications.
 
-    wget -O ./tmp/storageclass.yaml https://raw.githubusercontent.com/rook/rook/release-1.1/cluster/examples/kubernetes/ceph/csi/rbd/storageclass.yaml
+    wget -O ./tmp/storageclass.yaml https://raw.githubusercontent.com/rook/rook/release-1.2/cluster/examples/kubernetes/ceph/csi/rbd/storageclass.yaml
     sed -i 's|csi.storage.k8s.io/fstype: ext4|csi.storage.k8s.io/fstype: xfs|g' ./tmp/storageclass.yaml
     kubectl create -f ./tmp/storageclass.yaml
 
 
 Some sample apps are provided with rook for testing.
 
-    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.1/cluster/examples/kubernetes/mysql.yaml
-    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.1/cluster/examples/kubernetes/wordpress.yaml
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.2/cluster/examples/kubernetes/mysql.yaml
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.2/cluster/examples/kubernetes/wordpress.yaml
 
 
 You can see the state of the apps using `kubectl get all` as these will be
