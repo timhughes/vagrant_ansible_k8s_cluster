@@ -125,8 +125,10 @@ Provided below are installation instructions for both **metrics-server** and **P
 [Prometheus]: https://prometheus.io/
 [kube-prometheus]: https://github.com/coreos/kube-prometheus
 
-The kube-prometheus project makes prometheus run nativly on kubernetes.  
-These instructions are based on the quickstart from the kube-prometheus README which you should read for further details.
+The [kube-prometheus] project makes [prometheus] run nativly on kubernetes.  
+These instructions are based on the quickstart from the kube-prometheus 
+[README](https://github.com/coreos/kube-prometheus/blob/master/README.md) 
+which you should read for further details.
 
 Download and install kube-prometheus
 
@@ -147,10 +149,9 @@ You can access the rest of the services in a similar way.
 - `kubectl --namespace monitoring port-forward service/alertmanager-main 9093` http://127.0.0.1:9093
 
 ### Metrics Server. 
-
-Metrics Server is a cluster-wide aggregator of resource usage data.
-
 [Metrics Server]: https://github.com/kubernetes-sigs/metrics-server
+
+[Metrics Server] is a cluster-wide aggregator of resource usage data.
 
 To install the metrics server, clone the git repo and then checkout the latest
 revision. To list the available revisions use `git tag -l`.
@@ -203,9 +204,9 @@ Kubernetes. It can be extracted using the following:
 
 
 ### Rook Ceph Toolbox
+[rook-ceph-toolbox]: https://rook.io/docs/rook/master/ceph-toolbox.html
 
-To check the status of the Ceph cluster you can deploy the
-[rook-ceph-toolbox](https://rook.io/docs/rook/master/ceph-toolbox.html).
+To check the status of the Ceph cluster you can deploy the [rook-ceph-toolbox].
 Remember to change to the page that matches the version you have installed.
 
 Here is a TL;DR for rook-ceph-toolbox:
