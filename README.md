@@ -15,6 +15,21 @@ and the [Calico Container Network Interface] (CNI)
 [Docker Container Runtime Interface]: https://kubernetes.io/docs/setup/production-environment/container-runtimes/#docker
 [Calico Container Network Interface]: https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#pod-network
 
+There are multiple assumptions for this walkthough based on my personal setup. You may need to adjust to suit.
+
+- Fedora 29-31
+- vagrant from the fedora repos 
+- vagrant-libvirt from fedora repos
+
+
+Depending on your setup you may need to allow NFS through your firewall for libvirt.
+
+    firewall-cmd  --permanent --zone=libvirt --add-service=nfs
+    firewall-cmd  --permanent --zone=libvirt --add-service=mountd
+    firewall-cmd  --permanent --zone=libvirt --add-service=rpc-bind
+    firewall-cmd  --permanent --zone=libvirt --add-port=2049/tcp
+    firewall-cmd  --permanent --zone=libvirt --add-port=2049/udp
+    firewall-cmd --reload 
 
 
 Run Vagrant to bring up the boxes.
