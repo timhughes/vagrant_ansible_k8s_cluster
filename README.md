@@ -125,10 +125,12 @@ Provided below are installation instructions for both **metrics-server** and **P
 [Prometheus]: https://prometheus.io/
 [kube-prometheus]: https://github.com/coreos/kube-prometheus
 
+
 The [kube-prometheus] project makes [prometheus] run nativly on kubernetes.  
 These instructions are based on the quickstart from the kube-prometheus 
 [README](https://github.com/coreos/kube-prometheus/blob/master/README.md) 
 which you should read for further details.
+
 
 Download and install kube-prometheus
 
@@ -149,6 +151,7 @@ You can access the rest of the services in a similar way.
 - `kubectl --namespace monitoring port-forward service/alertmanager-main 9093` http://127.0.0.1:9093
 
 ### Metrics Server. 
+
 [Metrics Server]: https://github.com/kubernetes-sigs/metrics-server
 
 [Metrics Server] is a cluster-wide aggregator of resource usage data.
