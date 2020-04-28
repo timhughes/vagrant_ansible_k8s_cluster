@@ -19,7 +19,7 @@
   * [Connecting from the outside](#connecting-from-the-outside)
     + [Creating the LoadBalancer](#creating-the-loadbalancer)
 
-## Setup
+## Intro
 
 Vagrant does most of the initial setup here. It uses an Ansible provisioner to
 get a very basic install following the instructions from official docs starting
@@ -38,6 +38,19 @@ There are multiple assumptions for this walkthough based on my personal setup. Y
 - Fedora 29-31
 - vagrant from the fedora repos 
 - vagrant-libvirt from fedora repos
+
+## Setup
+
+Install vagrant and vagrant-libvirt from the standard repos then start the libvirtd service. 
+
+``` 
+sudo dnf -y groupinstall virtualization
+sudo dnf -y install vagrant vagrant-libvirt
+``` 
+``` 
+sudo systemctl enable --now libvirtd.service 
+```
+
 
 ### Set up access to NFS shares
 To allow the users in the `wheel` group to configure NFS shares for vagrant
