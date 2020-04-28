@@ -17,7 +17,7 @@
   register: vagrant_kube_conf
 
 
-- name: Setup kubeconfig for vagrant user
+- name: Setup kubeconfig for vagrant user and copy config to shared folder to make accessable from host.
   command: "{{ item }}"
   with_items:
     - mkdir -p /home/vagrant/.kube
