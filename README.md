@@ -21,6 +21,56 @@ There are multiple assumptions for this walkthough based on my personal setup. Y
 - vagrant from the fedora repos 
 - vagrant-libvirt from fedora repos
 
+### Set up access to NFS shares
+To allow the users in the `wheel` group to configure NFS shares for vagrant
+create the file `/etc/sudoers.d/vagrant-syncedfolders` with the following
+content.
+
+```
+sudo vim /etc/sudoers.d/vagrant-syncedfolders
+```
+
+```
+Cmnd_Alias VAGRANT_EXPORTS_CHOWN = /bin/chown 0\:0 /tmp/*
+Cmnd_Alias VAGRANT_EXPORTS_MV = /bin/mv -f /tmp/* /etc/exports
+Cmnd_Alias VAGRANT_NFSD_CHECK = /usr/bin/systemctl status --no-pager nfs-server.service
+Cmnd_Alias VAGRANT_NFSD_START = /usr/bin/systemctl start nfs-server.service
+Cmnd_Alias VAGRANT_NFSD_APPLY = /usr/sbin/exportfs -ar
+%wheel ALL=(root) NOPASSWD: VAGRANT_EXPORTS_CHOWN, VAGRANT_EXPORTS_MV, VAGRANT_NFSD_CHECK, VAGRANT_NFSD_START, VAGRANT_NFSD_APPLY
+```
+
+```
+sudo chmod 644 /etc/sudoers.d/vagrant-syncedfolders
+sudo chown root.root /etc/sudoers.d/vagrant-syncedfolders
+```
+
+### Polkit access for `wheel` users to manage libvirt.
+
+Create `/etc/polkit-1/rules.d/80-libvirt-manage.rules` with the following
+content. This will allow people in the `wheel` group to use libvirt without
+requiring a password.
+
+Once again Debian users need to change the `wheel` group to `vagrant`
+```
+sudo vim /etc/polkit-1/rules.d/80-libvirt-manage.rules
+```
+
+```
+polkit.addRule(function(action, subject) {
+    if (action.id == "org.libvirt.unix.manage" && subject.local && subject.active && subject.isInGroup("wheel")) {
+    return polkit.Result.YES;
+    }
+});
+```
+
+
+```
+sudo chmod 644 /etc/polkit-1/rules.d/80-libvirt-manage.rules
+sudo chown root.root /etc/polkit-1/rules.d/80-libvirt-manage.rules
+```
+
+### Firewall access for NFS
+
 
 Depending on your setup you may need to allow NFS through your firewall for libvirt.
 
@@ -31,7 +81,7 @@ Depending on your setup you may need to allow NFS through your firewall for libv
     firewall-cmd  --permanent --zone=libvirt --add-port=2049/udp
     firewall-cmd --reload 
 
-
+## Create the cluster with Vagrant
 Run Vagrant to bring up the boxes.
 
     vagrant up
