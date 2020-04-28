@@ -89,15 +89,27 @@ sudo chown root.root /etc/polkit-1/rules.d/80-libvirt-manage.rules
 
 ### Firewall access for NFS
 
+If you are having dificulty with NFS not mounting you may need to allow it
+through the firewall on the host.
 
-Depending on your setup you may need to allow NFS through your firewall for libvirt.
+On Fedora 31 you need to allow it through the `libvirt` firewalld zone
 
-    firewall-cmd  --permanent --zone=libvirt --add-service=nfs
-    firewall-cmd  --permanent --zone=libvirt --add-service=mountd
-    firewall-cmd  --permanent --zone=libvirt --add-service=rpc-bind
-    firewall-cmd  --permanent --zone=libvirt --add-port=2049/tcp
-    firewall-cmd  --permanent --zone=libvirt --add-port=2049/udp
-    firewall-cmd --reload 
+Allow NFS through the `libvirt` zone.
+```
+firewall-cmd --zone=libvirt --list-all
+```
+```
+firewall-cmd  --permanent --zone=libvirt --add-service=nfs
+firewall-cmd  --permanent --zone=libvirt --add-service=mountd
+firewall-cmd  --permanent --zone=libvirt --add-service=rpc-bind
+firewall-cmd  --permanent --zone=libvirt --add-port=2049/tcp
+firewall-cmd  --permanent --zone=libvirt --add-port=2049/udp
+firewall-cmd --reload 
+```
+```
+firewall-cmd --zone=libvirt --list-all
+```
+
 
 ## Create the cluster with Vagrant
 Run Vagrant to bring up the boxes.
