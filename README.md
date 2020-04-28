@@ -1,5 +1,23 @@
 # Vagrant -> Ansible -> Kubernetes
 
+- [Vagrant -> Ansible -> Kubernetes](#vagrant----ansible----kubernetes)
+  * [Setup](#setup)
+    + [Set up access to NFS shares](#set-up-access-to-nfs-shares)
+    + [Polkit access for `wheel` users to manage libvirt.](#polkit-access-for--wheel--users-to-manage-libvirt)
+    + [Firewall access for NFS](#firewall-access-for-nfs)
+  * [Create the cluster with Vagrant](#create-the-cluster-with-vagrant)
+  * [Checking if your cluster is correctly running.](#checking-if-your-cluster-is-correctly-running)
+  * [Management](#management)
+    + [Deploying the Dashboard.](#deploying-the-dashboard)
+  * [Monitoring](#monitoring)
+    + [Prometheus](#prometheus)
+    + [Metrics Server.](#metrics-server)
+  * [Storage](#storage)
+    + [Deloying a Rook Ceph cluster](#deloying-a-rook-ceph-cluster)
+    + [Rook Ceph Toolbox](#rook-ceph-toolbox)
+    + [Creating Ceph block devices](#creating-ceph-block-devices)
+  * [Connecting from the outside](#connecting-from-the-outside)
+    + [Creating the LoadBalancer](#creating-the-loadbalancer)
 
 ## Setup
 
