@@ -1,6 +1,7 @@
 # Vagrant -> Ansible -> Kubernetes
 
 - [Vagrant -> Ansible -> Kubernetes](#vagrant----ansible----kubernetes)
+  * [Introduction](#introduction)
   * [Setup](#setup)
     + [Set up access to NFS shares](#set-up-access-to-nfs-shares)
     + [Polkit access for `wheel` users to manage libvirt.](#polkit-access-for--wheel--users-to-manage-libvirt)
@@ -19,7 +20,7 @@
   * [Connecting from the outside](#connecting-from-the-outside)
     + [Creating the LoadBalancer](#creating-the-loadbalancer)
 
-## Intro
+## Introduction
 
 Vagrant does most of the initial setup here. It uses an Ansible provisioner to
 get a very basic install following the instructions from official docs starting
@@ -81,7 +82,6 @@ Create `/etc/polkit-1/rules.d/80-libvirt-manage.rules` with the following
 content. This will allow people in the `wheel` group to use libvirt without
 requiring a password.
 
-Once again Debian users need to change the `wheel` group to `vagrant`
 ```
 sudo vim /etc/polkit-1/rules.d/80-libvirt-manage.rules
 ```
