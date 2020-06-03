@@ -7,8 +7,9 @@
     gpgcheck: "yes"
     enabled: "yes"
     gpgkey: "https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg"
-    exclude: kube*
+    exclude: kubelet kubeadm kubectl
     state: present
+    reposdir: /etc/yum.repos.d
 
 - name: Install Kubernetes
   yum:

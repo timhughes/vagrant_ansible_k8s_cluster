@@ -1,2 +1,4 @@
 ---
-pod_network_cidr: 10.10.0.0/16
+# pod_network_cidr: 10.10.0.0/16 # Calico can be any rangge but a /16 is good
+pod_network_cidr: 10.217.0.0/16  # Cilium - it has to be this
+cilium_version: v1.6

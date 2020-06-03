@@ -11,47 +11,62 @@
     - not kubeadm_already_run.stat.exists
 
 
-- name: Check if vagrant user has ~/.kube/conf
+#- name: Check if vagrant has ~/.kube/conf
+#  stat:
+#    path: "/home/vagrant/.kube/config"
+#  register: vagrant_kube_conf
+#
+#
+#- name: Setup kubeconfig for vagrant user and copy config to shared folder to make accessable from host.
+#  command: "{{ item }}"
+#  with_items:
+#    - mkdir -p /home/vagrant/.kube
+#    - /bin/cp /etc/kubernetes/admin.conf /home/vagrant/.kube/config
+#    - /bin/cp /etc/kubernetes/admin.conf /vagrant/tmp/kubeadmin.conf
+#    - chown vagrant:vagrant /home/vagrant/.kube/config
+#  when:
+#    - not vagrant_kube_conf.stat.exists
+
+- name: Check if root has ~/.kube/conf
   stat:
-    path: "/home/vagrant/.kube/config"
-  register: vagrant_kube_conf
+    path: "/root/.kube/config"
+  register: root_kube_conf
 
 
-- name: Setup kubeconfig for vagrant user and copy config to shared folder to make accessable from host.
+- name: Setup kubeconfig for root user.
   command: "{{ item }}"
   with_items:
-    - mkdir -p /home/vagrant/.kube
-    - /bin/cp /etc/kubernetes/admin.conf /home/vagrant/.kube/config
-    - /bin/cp /etc/kubernetes/admin.conf /vagrant/tmp/kubeadmin.conf
-    - chown vagrant:vagrant /home/vagrant/.kube/config
+    - mkdir -p /root/.kube
+    - /bin/cp /etc/kubernetes/admin.conf /root/.kube/config
   when:
-    - not vagrant_kube_conf.stat.exists
+    - not root_kube_conf.stat.exists
 
-- name: Check if calico kubeconfig exists
+- name: Copy join command to local file
+  #become: false
+  local_action:
+    module: copy
+    content: /etc/kubernetes/admin.conf
+    dest: "../etc/kubeadmin.conf"
+
+- name: Check if Cilium kubeconfig exists
   stat:
-    path: "/etc/cni/net.d/calico-kubeconfig"
-  register: calico_kubeconfig
+    path: "/etc/cni/net.d/cilium-kubeconfig"
+  register: cilium_kubeconfig
 
-- name: Create calico manifest
-  become: false
-  template:
-    src: calico.yaml.j2
-    dest: /tmp/calico.yaml
-
-- name: Install calico pod network
-  become: false
-  command: kubectl create -f /tmp/calico.yaml
+- name: Install Cilium pod network
+  #become: false
+  command: kubectl create -f https://raw.githubusercontent.com/cilium/cilium/{{ cilium_version }}/install/kubernetes/quick-install.yaml
   when:
-    - not calico_kubeconfig.stat.exists
+    - not cilium_kubeconfig.stat.exists
 
 - name: Generate join command
   command: kubeadm token create --print-join-command
-  become: false
+  #become: false
   register: join_command
 
 - name: Copy join command to local file
-  become: false
+  #become: false
   local_action:
     module: copy
     content: "{{ join_command.stdout_lines[0] }}"
-    dest: "./join-command"
+    dest: "../join-command"

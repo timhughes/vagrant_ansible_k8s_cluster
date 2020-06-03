@@ -10,6 +10,7 @@
     packages:
       - device-mapper-persistent-data
       - lvm2
+      - yum-utils
 
 - name: Add yum repository for Docker stable
   yum_repository:
@@ -28,7 +29,9 @@
     enablerepo: docker-ce-stable
   vars:
     packages:
-      - docker-ce-18.06.1.ce
+      - containerd.io-1.2.13
+      - docker-ce-19.03.8
+      - docker-ce-cli-19.03.8
   notify:
     - docker status
 

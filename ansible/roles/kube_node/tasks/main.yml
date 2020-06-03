@@ -61,9 +61,9 @@
     reload: "yes"
   when: sysctl_bridge_nf_call_iptables.rc == 0
   with_items:
-    - net.bridge.bridge-nf-call-iptables
     - net.bridge.bridge-nf-call-arptables
     - net.bridge.bridge-nf-call-ip6tables
+    - net.bridge.bridge-nf-call-iptables
 
 - import_tasks: install.yml
   tags:
