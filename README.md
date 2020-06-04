@@ -200,7 +200,7 @@ like all things in k8s this is interchangable with other solutions such as
 Provided below are installation instructions for both **Prometheus** and
 **metrics-server**. You can only choose one. Prometheus is a much more
 comprehensive monitoring system and in most cases it is the prefered option but
-if you are a resource constrained environment then metrics-server may be your
+if you are in a resource constrained environment then metrics-server may be your
 prefered option.
 
 ### Prometheus
