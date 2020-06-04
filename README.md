@@ -117,7 +117,7 @@ Next see how the kubernetes cluster is running:
     kubectl get all --all-namespaces
 
 
-Make sure that none of the pods are all in `Running` state. If you have some 
+Make sure that none of the pods are all in `Running` state. If you have some
 that are in a `CrashLoopBackOff` state you should investigate the logs.
 
     kubectl logs -n kube-system pod/etcd-master-11
@@ -125,8 +125,8 @@ that are in a `CrashLoopBackOff` state you should investigate the logs.
 
 ## Checking if your cluster is correctly running.
 
-See the [CNCF instructions](https://github.com/cncf/k8s-conformance/blob/master/instructions.md) 
-or the more detailed instruction 
+See the [CNCF instructions](https://github.com/cncf/k8s-conformance/blob/master/instructions.md)
+or the more detailed instruction
 [README for sonobouy](https://github.com/vmware-tanzu/sonobuoy/blob/master/README.md)
 
 Once you have sonobouy installed the way to check is just to run it. Running it
@@ -137,7 +137,7 @@ cluster, otherwise it can take an hour or so if you use `--mode=certified-confor
 
 or
 
-    sonobuoy run --mode=certified-conformance 
+    sonobuoy run --mode=certified-conformance
 
 When it is complete you can retrieve the results and display them.
 
@@ -192,9 +192,16 @@ The second way is to create a port forward. This way often works best as the app
 
 
 ## Monitoring
-The original application for this was named **heapster** but it has now been deprecated. This is being replaced by a new service named **metrics-server** but like all things in k8s this is interchangable with other solutions such as **prometheus**.
+The original application for this was named **heapster** but it has now been
+deprecated. This is being replaced by a new service named **metrics-server** but
+like all things in k8s this is interchangable with other solutions such as
+**prometheus**.
 
-Provided below are installation instructions for both **metrics-server** and **Prometheus**. You can only choose one.
+Provided below are installation instructions for both **Prometheus** and
+**metrics-server**. You can only choose one. Prometheus is a much more
+comprehensive monitoring system and in most cases it is the prefered option but
+if you are a resource constrained environment then metrics-server may be your
+prefered option.
 
 ### Prometheus
 
@@ -431,10 +438,10 @@ make this accessable from other machines in the network.
 
 ## Extras
 
-### Set up access to NFS shares. 
+### Set up access to NFS shares.
 
-This is not necessary for everything above but sometimes it is useful, 
-especially because it is not simeple to copy files from a vagrant node to the 
+This is not necessary for everything above but sometimes it is useful,
+especially because it is not simeple to copy files from a vagrant node to the
 host.
 
 To allow the users in the `wheel` group to configure NFS shares for vagrant
