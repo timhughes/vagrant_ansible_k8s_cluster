@@ -48,6 +48,11 @@ Vagrant.configure("2") do |config|
         node.vm.hostname = hostname
         node.vm.network "private_network", ip: "192.168.200.#{id}" #, libvirt__forward_mode: 'route'
         node.vm.provision "shell", inline: 'sed -i "/$HOSTNAME/d" /etc/hosts'
+        if node_conf[:role].eql?('worker')
+          node.vm.provider :libvirt do |libvirt|
+            libvirt.storage :file, :size => '40G'
+          end
+        end
       end
     end
   end

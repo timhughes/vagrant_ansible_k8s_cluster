@@ -265,7 +265,16 @@ The TL;DR for the rook quickstart is the following commands:
 
     kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/ceph/common.yaml
     kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/ceph/operator.yaml
+
+For testing Ceph will use a raw directory `/var/lib/libvirt` with `cluster-test.yaml`
+
     kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/ceph/cluster-test.yaml
+
+If you want a production cluster then you need either raw block devices, raw
+partitions or lvm pvs. In this case you should read the docs in more detail at
+the quickstart link above and use this `cluster.yaml`
+
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/ceph/cluster.yaml
 
 These take a little while to get bootstrapped. You can check the state of the pods using:
 
@@ -287,6 +296,63 @@ Kubernetes. It can be extracted using the following:
 
     kubectl -n rook-ceph get secret rook-ceph-dashboard-password -o jsonpath="{['data']['password']}" | base64 --decode && echo
 
+Troubleshooting
+
+- https://rook.io/docs/rook/v1.3/ceph-common-issues.html
+
+### Deleteing Ceph Cluster
+
+If you need to remove the Ceph cluster for some reason you can follow the following instructions.
+
+- https://rook.io/docs/rook/v1.3/ceph-teardown.html
+
+Here is the TL:DR
+
+First you need to delete any persistant volumes and claims. If you have done the
+wordpress example the these are the commands
+
+    kubectl delete -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/mysql.yaml
+    kubectl delete -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/wordpress.yaml
+
+
+Delete the Block and File artifacts
+
+    kubectl delete -n rook-ceph cephblockpool replicapool
+    kubectl delete storageclass rook-ceph-block
+    kubectl delete -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/ceph/csi/cephfs/kube-registry.yaml
+    kubectl delete storageclass csi-cephfs
+
+Delete the CephCluster CRD. If you used **cluster-test.yaml** the cluster name
+is `my-cluster`, if you used **cluster.yaml** it is named `rook-ceph`
+
+    kubectl -n rook-ceph delete cephcluster my-cluster
+
+Verify that the pods and cluster CRD has been deleted before continuing to the next step.
+
+    kubectl -n rook-ceph get pod
+    kubectl -n rook-ceph get cephcluster
+
+Delete the Operator and related Resources
+
+    kubectl delete -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/ceph/operator.yaml
+    kubectl delete -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/ceph/common.yaml
+
+Delete the data on hosts
+
+    ansible --become -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory worker -m file -a 'dest=/var/lib/rook/rook-ceph state=absent'
+    ansible --become -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory worker -m file -a 'dest=/var/lib/rook/mon-a state=absent'
+    ansible --become -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory worker -m file -a 'dest=/var/lib/rook/mon-b state=absent'
+    ansible --become -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory worker -m file -a 'dest=/var/lib/rook/mon-c state=absent'
+
+Check that it is all cleard up
+
+    ansible -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory worker -a 'ls /var/lib/rook/'
+
+See the Troubleshooting section at the bottom of this page if you run into issues.
+
+- https://rook.io/docs/rook/v1.3/ceph-teardown.html
+
+
 
 ### Rook Ceph Toolbox
 [rook-ceph-toolbox]: https://rook.io/docs/rook/master/ceph-toolbox.html
@@ -296,9 +362,9 @@ Remember to change to the page that matches the version you have installed.
 
 Here is a TL;DR for rook-ceph-toolbox:
 
-    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.2/cluster/examples/kubernetes/ceph/toolbox.yaml
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/ceph/toolbox.yaml
     kubectl -n rook-ceph get pod -l "app=rook-ceph-tools"
-    kubectl -n rook-ceph exec -it $(kubectl -n rook-ceph get pod -l "app=rook-ceph-tools" -o jsonpath='{.items[0].metadata.name}') bash
+    kubectl -n rook-ceph exec -it $(kubectl -n rook-ceph get pod -l "app=rook-ceph-tools" -o jsonpath='{.items[0].metadata.name}') - bash
 
 The quick commands to get an overview are:
 
@@ -315,15 +381,18 @@ Once you are done you can delete the toolbox:
 ### Creating Ceph block devices
 
 The following will create a `rook-ceph-block` StorageClass which can be used by
-applications. These will be ext4 by default so if you want to change it then download the yamls and edit before creating.
+applications. These will be ext4 by default so if you want to change it then
+download the yamls and edit before creating.
 
-There are 2 different yamls available at https://github.com/rook/rook/tree/release-1.2/cluster/examples/kubernetes/ceph/csi/rbd `storageclass.yaml` which requres 3 replicas and `storageclass-test.yaml` which is designed for testing on a single node. Pick one and create it.
+There are 2 different yamls available at https://github.com/rook/rook/tree/release-1.3/cluster/examples/kubernetes/ceph/csi/rbd
+`storageclass.yaml` which requres 3 replicas and `storageclass-test.yaml` which
+is designed for testing on a single node. Pick one and create it.
 
-    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.2/cluster/examples/kubernetes/ceph/csi/rbd/storageclass-test.yaml
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.2/cluster/examples/kubernetes/ceph/csi/rbd/storageclass.yaml
 
 or
 
-    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.2/cluster/examples/kubernetes/ceph/csi/rbd/storageclass.yaml
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.2/cluster/examples/kubernetes/ceph/csi/rbd/storageclass-test.yaml
 
 
 Some sample apps are provided with rook for testing.
@@ -488,3 +557,4 @@ firewall-cmd --reload
 firewall-cmd --zone=libvirt --list-all
 ```
 
+<!-- vim: set ft=markdown ts=4 sw=4 tw=999 et :-->
