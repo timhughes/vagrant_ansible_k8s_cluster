@@ -4,34 +4,15 @@
     path: "/var/lib/kubelet/config.yaml"
   register: kubeadm_already_run
 
-
 - name: Initialize the Kubernetes cluster using kubeadm
   command: kubeadm init --pod-network-cidr={{ pod_network_cidr }}
   when:
     - not kubeadm_already_run.stat.exists
 
-
-#- name: Check if vagrant has ~/.kube/conf
-#  stat:
-#    path: "/home/vagrant/.kube/config"
-#  register: vagrant_kube_conf
-#
-#
-#- name: Setup kubeconfig for vagrant user and copy config to shared folder to make accessable from host.
-#  command: "{{ item }}"
-#  with_items:
-#    - mkdir -p /home/vagrant/.kube
-#    - /bin/cp /etc/kubernetes/admin.conf /home/vagrant/.kube/config
-#    - /bin/cp /etc/kubernetes/admin.conf /vagrant/tmp/kubeadmin.conf
-#    - chown vagrant:vagrant /home/vagrant/.kube/config
-#  when:
-#    - not vagrant_kube_conf.stat.exists
-
 - name: Check if root has ~/.kube/conf
   stat:
     path: "/root/.kube/config"
   register: root_kube_conf
-
 
 - name: Setup kubeconfig for root user.
   command: "{{ item }}"
@@ -42,31 +23,36 @@
     - not root_kube_conf.stat.exists
 
 - name: Copy admin.conf file to local file ./kubeadmin.conf
-  #become: false
   fetch:
     src: /etc/kubernetes/admin.conf
     dest: "../etc/kubeadmin.conf"
     flat: "yes"
 
-#- name: Check if Cilium kubeconfig exists
-#  stat:
-#    path: "/etc/cni/net.d/cilium-kubeconfig"
-#  register: cilium_kubeconfig
+- name: Check if calico kubeconfig exists
+  stat:
+    path: "/etc/cni/net.d/calico-kubeconfig"
+  register: calico_kubeconfig
 
-- name: Check if Cilium is configured
-  command: kubectl get configmaps cilium-config -n kube-system
-  failed_when: false
-  changed_when: false
-  register: cilium_configured
+- name: Install calico pod network
+  command: kubectl create -f https://docs.projectcalico.org/{{ calico_version }}/manifests/calico.yaml
+  when:
+    - not calico_kubeconfig.stat.exists
 
-- name: Install Cilium pod network
-  #become: false
-  command: kubectl create -f https://raw.githubusercontent.com/cilium/cilium/{{ cilium_version }}/install/kubernetes/quick-install.yaml
-  when: cilium_configured.rc == 1
+# Cilium requires kernel version is >= 4.8.0 - maybe someday :-(
+# https://github.com/timhughes/vagrant_ansible_k8s_cluster/issues/4
+#- name: Check if Cilium is configured
+#  command: kubectl get configmaps cilium-config -n kube-system
+#  failed_when: false
+#  changed_when: false
+#  register: cilium_configured
+#
+#- name: Install Cilium pod network
+#  #become: false
+#  command: kubectl create -f https://raw.githubusercontent.com/cilium/cilium/{{ cilium_version }}/install/kubernetes/quick-install.yaml
+#  when: cilium_configured.rc == 1
 
 - name: Generate join command
   command: kubeadm token create --print-join-command
-  #become: false
   register: join_command
 
 - name: Copy join command to local file
@@ -75,10 +61,3 @@
   copy:
     content: "{{ join_command.stdout_lines[0] }}"
     dest: "../tmp/join-command"
-
-#- name: Copy join command to local file
-#  local_action:
-#    module: copy
-#    content: "{{ join_command.stdout_lines[0] }}"
-#    dest: "./join-command"
-

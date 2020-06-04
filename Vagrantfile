@@ -14,10 +14,11 @@ Vagrant.configure("2") do |config|
 
   #config.vm.box = "timhughes/centos7"
   config.vm.box = "centos/7"
-  config.vm.synced_folder ".",
-    "/vagrant",
-    type: "nfs",
-    nfs_udp: false
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  #config.vm.synced_folder ".",
+  #  "/vagrant",
+  #  type: "nfs",
+  #  nfs_udp: false
 
   config.vm.provider :libvirt do |libvirt|
     libvirt.cpus = 2
