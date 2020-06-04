@@ -3,10 +3,9 @@
 - [Vagrant -> Ansible -> Kubernetes](#vagrant----ansible----kubernetes)
   * [Introduction](#introduction)
   * [Setup](#setup)
-    + [Set up access to NFS shares](#set-up-access-to-nfs-shares)
     + [Polkit access for `wheel` users to manage libvirt.](#polkit-access-for--wheel--users-to-manage-libvirt)
-    + [Firewall access for NFS](#firewall-access-for-nfs)
   * [Create the cluster with Vagrant](#create-the-cluster-with-vagrant)
+  * [Kubectl](#kubectl)
   * [Checking if your cluster is correctly running.](#checking-if-your-cluster-is-correctly-running)
   * [Management](#management)
     + [Deploying the Dashboard.](#deploying-the-dashboard)
@@ -15,10 +14,17 @@
     + [Metrics Server.](#metrics-server)
   * [Storage](#storage)
     + [Deloying a Rook Ceph cluster](#deloying-a-rook-ceph-cluster)
+    + [Deleteing Ceph Cluster](#deleteing-ceph-cluster)
     + [Rook Ceph Toolbox](#rook-ceph-toolbox)
     + [Creating Ceph block devices](#creating-ceph-block-devices)
   * [Connecting from the outside](#connecting-from-the-outside)
     + [Creating the LoadBalancer](#creating-the-loadbalancer)
+  * [Extras](#extras)
+    + [Set up Vagrant NFS shares.](#set-up-vagrant-nfs-shares)
+      - [Host NFS configuration](#host-nfs-configuration)
+      - [Firewall access for NFS](#firewall-access-for-nfs)
+
+<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
 ## Introduction
 
