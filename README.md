@@ -258,6 +258,9 @@ with the following command:
 
 The instructions are at https://rook.io/docs/rook/v1.3/ceph-quickstart.html
 
+For rock-ceph to work you need either a raw block device, raw
+partition or blank lvm pv.
+
 In my experience the main thing that causes issues here is networking internally
 to kubernetes.
 
@@ -266,12 +269,11 @@ The TL;DR for the rook quickstart is the following commands:
     kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/ceph/common.yaml
     kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/ceph/operator.yaml
 
-For testing Ceph will use a raw directory `/var/lib/libvirt` with `cluster-test.yaml`
+
 
     kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/ceph/cluster-test.yaml
 
-If you want a production cluster then you need either raw block devices, raw
-partitions or lvm pvs. In this case you should read the docs in more detail at
+If you want a production cluster then you need  In this case you should read the docs in more detail at
 the quickstart link above and use this `cluster.yaml`
 
     kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/ceph/cluster.yaml
@@ -285,11 +287,12 @@ Once the Ceph cluster is running you can access it using the `kubectl proxy`:
 - http://localhost:8001/api/v1/namespaces/rook-ceph/services/https:rook-ceph-mgr-dashboard:8443/proxy/
 
 This is an example of application not working correctly using the proxy due to the way the Ceph
-Dashboard redirects on login we should use the port-forward method instead.
+Dashboard redirects on login we should use the port-forward method instead. Use port `9443:8443`
+(because dashboard is already on 8443) if you used *cluster.yaml* and `7000` if you used *cluster-test.yaml*
 
-    kubectl --namespace rook-ceph port-forward service/rook-ceph-mgr-dashboard 8443
+    kubectl --namespace rook-ceph port-forward service/rook-ceph-mgr-dashboard 7000
 
-- http://127.0.0.1:8443
+- http://127.0.0.1:7000
 
 The default username is `admin` and the password is randomly generated and stored in
 Kubernetes. It can be extracted using the following:
@@ -348,6 +351,9 @@ Check that it is all cleard up
 
     ansible -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory worker -a 'ls /var/lib/rook/'
 
+Lastly you need to reinitialize the block devices. This will depend on what type of device you have used.
+
+
 See the Troubleshooting section at the bottom of this page if you run into issues.
 
 - https://rook.io/docs/rook/v1.3/ceph-teardown.html
@@ -388,17 +394,17 @@ There are 2 different yamls available at https://github.com/rook/rook/tree/relea
 `storageclass.yaml` which requres 3 replicas and `storageclass-test.yaml` which
 is designed for testing on a single node. Pick one and create it.
 
-    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.2/cluster/examples/kubernetes/ceph/csi/rbd/storageclass.yaml
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/ceph/csi/rbd/storageclass.yaml
 
 or
 
-    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.2/cluster/examples/kubernetes/ceph/csi/rbd/storageclass-test.yaml
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/ceph/csi/rbd/storageclass-test.yaml
 
 
 Some sample apps are provided with rook for testing.
 
-    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.2/cluster/examples/kubernetes/mysql.yaml
-    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.2/cluster/examples/kubernetes/wordpress.yaml
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/mysql.yaml
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/wordpress.yaml
 
 
 You can see the state of the apps using `kubectl get all` as these will be
@@ -453,7 +459,10 @@ earlier to use Calico works fine because we wont be using BGP.
 
 Installation is a simple apply of a manifest:
 
-    kubectl apply -f https://raw.githubusercontent.com/google/metallb/v0.8.1/manifests/metallb.yaml
+    kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.9.3/manifests/namespace.yaml
+    kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.9.3/manifests/metallb.yaml
+    # On first install only
+    kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
 
 
 MetalLB can use ARP or BGP to manage the address space. The simpler of the two
@@ -490,10 +499,10 @@ an exteral IP address that can be accessed from your workstation.
 You can check this by getting the services:
 
     $ kubectl get services -o wide
-    NAME              TYPE           CLUSTER-IP    EXTERNAL-IP      PORT(S)        AGE    SELECTOR
-    kubernetes        ClusterIP      10.96.0.1     <none>           443/TCP        121m   <none>
-    wordpress         LoadBalancer   10.98.86.15   172.28.128.101   80:30910/TCP   34m    app=wordpress,tier=frontend
-    wordpress-mysql   ClusterIP      None          <none>           3306/TCP       92m    app=wordpress,tier=mysql
+    NAME              TYPE           CLUSTER-IP     EXTERNAL-IP       PORT(S)        AGE     SELECTOR
+    kubernetes        ClusterIP      10.96.0.1      <none>            443/TCP        4h59m   <none>
+    wordpress         LoadBalancer   10.96.130.76   192.168.200.100   80:31814/TCP   13m     app=wordpress,tier=frontend
+    wordpress-mysql   ClusterIP      None           <none>            3306/TCP       13m     app=wordpress,tier=mysql
 
 
 In this instance NAT has been used but it should be possible to use macvtap to
@@ -506,7 +515,7 @@ make this accessable from other machines in the network.
 
 ## Extras
 
-### Set up access to NFS shares.
+### Set up Vagrant NFS shares.
 
 This is not necessary for everything above but sometimes it is useful,
 especially because it is not simeple to copy files from a vagrant node to the
@@ -556,5 +565,9 @@ firewall-cmd --reload
 ```
 firewall-cmd --zone=libvirt --list-all
 ```
+
+
+
+
 
 <!-- vim: set ft=markdown ts=4 sw=4 tw=999 et :-->

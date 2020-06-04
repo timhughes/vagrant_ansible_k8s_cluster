@@ -12,13 +12,16 @@ role_spacer = 10
 
 Vagrant.configure("2") do |config|
 
-  #config.vm.box = "timhughes/centos7"
   config.vm.box = "centos/7"
-  config.vm.synced_folder ".", "/vagrant", disabled: true
-  #config.vm.synced_folder ".",
-  #  "/vagrant",
-  #  type: "nfs",
-  #  nfs_udp: false
+
+  # Deliberatly disabled as it is not needed. Change `disabled: true`
+  # to `disabled: false` if you would like to use NFS shares or you can
+  # change to some other vagrant share system.
+  config.vm.synced_folder ".",
+    "/vagrant",
+    type: "nfs",
+    nfs_udp: false,
+    disabled: true
 
   config.vm.provider :libvirt do |libvirt|
     libvirt.cpus = 2
