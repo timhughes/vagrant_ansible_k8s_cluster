@@ -24,15 +24,13 @@
       - [Host NFS configuration](#host-nfs-configuration)
       - [Firewall access for NFS](#firewall-access-for-nfs)
 
-<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
-
 ## Introduction
 
-Vagrant does most of the initial setup here. It uses an Ansible provisioner to
-get a very basic install following the instructions from official docs starting
-at [Installing kubeadm] and going as far as [Creating a single control-plane
-cluster with kubeadm]. It uses the [Docker Container Runtime Interface] (CRI)
-and the [Calico Container Network Interface] (CNI)
+Vagrant does most of the initial setup here. It uses an Ansible provisioner to get a very
+basic install following the instructions from official docs starting at [Installing
+kubeadm] and going as far as [Creating a single control-plane cluster with kubeadm]. It
+uses the [Docker Container Runtime Interface] (CRI) and the [Calico Container Network
+Interface] (CNI)
 
 
 [Installing kubeadm]: https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
@@ -40,7 +38,8 @@ and the [Calico Container Network Interface] (CNI)
 [Docker Container Runtime Interface]: https://kubernetes.io/docs/setup/production-environment/container-runtimes/#docker
 [Calico Container Network Interface]: https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#pod-network
 
-There are multiple assumptions for this walkthough based on my personal setup. You may need to adjust to suit.
+There are multiple assumptions for this walkthough based on my personal setup. You may
+need to adjust to suit.
 
 - Fedora 32
 - vagrant from the fedora repos
@@ -170,8 +169,9 @@ The main instructions are
 
     kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.1/aio/deploy/recommended.yaml
 
-Create a user and make it a member of the role cluster-admin (You should use something more secure in production).
-You can follow the instructions at https://github.com/kubernetes/dashboard/blob/master/docs/user/access-control/creating-sample-user.md
+Create a user and make it a member of the role cluster-admin (You should use something
+more secure in production).  You can follow the instructions at
+https://github.com/kubernetes/dashboard/blob/master/docs/user/access-control/creating-sample-user.md
 or use the following commands.
 
     kubectl create serviceaccount -n kubernetes-dashboard admin-user
@@ -189,7 +189,9 @@ accessed in this way.
 
 - http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
 
-The second way is to create a port forward. This way often works best as the application may be using redirects that break using `kubectl proxy`. This command requires the node to have 'socat' installed.
+The second way is to create a port forward. This way often works best as the application
+may be using redirects that break using `kubectl proxy`. This command requires the node to
+have 'socat' installed.
 
     kubectl --namespace kubernetes-dashboard port-forward svc/kubernetes-dashboard 8443:443
 
@@ -198,16 +200,14 @@ The second way is to create a port forward. This way often works best as the app
 
 
 ## Monitoring
-The original application for this was named **heapster** but it has now been
-deprecated. This is being replaced by a new service named **metrics-server** but
-like all things in k8s this is interchangable with other solutions such as
-**prometheus**.
+The original application for this was named **heapster** but it has now been deprecated.
+This is being replaced by a new service named **metrics-server** but like all things in
+k8s this is interchangable with other solutions such as **prometheus**.
 
 Provided below are installation instructions for both **Prometheus** and
-**metrics-server**. You can only choose one. Prometheus is a much more
-comprehensive monitoring system and in most cases it is the prefered option but
-if you are in a resource constrained environment then metrics-server may be your
-prefered option.
+**metrics-server**. You can only choose one. Prometheus is a much more comprehensive
+monitoring system and in most cases it is the prefered option but if you are in a resource
+constrained environment then metrics-server may be your prefered option.
 
 ### Prometheus
 
@@ -245,15 +245,15 @@ You can access the rest of the services in a similar way.
 
 [Metrics Server] is a cluster-wide aggregator of resource usage data.
 
-To install the metrics server, clone the git repo and then checkout the latest
-revision. To list the available revisions use `git tag -l`.
+To install the metrics server, clone the git repo and then checkout the latest revision.
+To list the available revisions use `git tag -l`.
 
     git clone https://github.com/kubernetes-sigs/metrics-server ./tmp/metrics-server
     cd ./tmp/metrics-server
     git checkout v0.3.6
 
-Once the correct revision is checked out you can create the server in kubernetes
-with the following command:
+Once the correct revision is checked out you can create the server in kubernetes with the
+following command:
 
     kubectl create -f deploy/1.8+/
 
@@ -264,11 +264,10 @@ with the following command:
 
 The instructions are at https://rook.io/docs/rook/v1.3/ceph-quickstart.html
 
-For rock-ceph to work you need either a raw block device, raw
-partition or blank lvm pv.
+For rock-ceph to work you need either a raw block device, raw partition or blank lvm pv.
 
-In my experience the main thing that causes issues here is networking internally
-to kubernetes.
+In my experience the main thing that causes issues here is networking internally to
+kubernetes.
 
 The TL;DR for the rook quickstart is the following commands:
 
@@ -279,8 +278,8 @@ The TL;DR for the rook quickstart is the following commands:
 
     kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/ceph/cluster-test.yaml
 
-If you want a production cluster then you need  In this case you should read the docs in more detail at
-the quickstart link above and use this `cluster.yaml`
+If you want a production cluster then you need  In this case you should read the docs in
+more detail at the quickstart link above and use this `cluster.yaml`
 
     kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/ceph/cluster.yaml
 
@@ -288,13 +287,16 @@ These take a little while to get bootstrapped. You can check the state of the po
 
     kubectl  get all -n rook-ceph
 
-Once the Ceph cluster is running you can access it using the `kubectl proxy`:
+Once the Ceph cluster is running you can access it using the `kubectl proxy` Use port
+`https:rook-ceph-mgr-dashboard:8443` (because dashboard is already on 8443) if you used
+*cluster.yaml* and `http:rook-ceph-mgr-dashboard:7000` if you used *cluster-test.yaml*:
 
-- http://localhost:8001/api/v1/namespaces/rook-ceph/services/https:rook-ceph-mgr-dashboard:8443/proxy/
+- http://localhost:8001/api/v1/namespaces/rook-ceph/services/http:rook-ceph-mgr-dashboard:7000/proxy/
 
-This is an example of application not working correctly using the proxy due to the way the Ceph
-Dashboard redirects on login we should use the port-forward method instead. Use port `9443:8443`
-(because dashboard is already on 8443) if you used *cluster.yaml* and `7000` if you used *cluster-test.yaml*
+This is an example of application not working correctly using the proxy due to the way the
+Ceph Dashboard redirects on login we should use the port-forward method instead. Use port
+`9443:8443` (because dashboard is already on 8443) if you used *cluster.yaml* and `7000`
+if you used *cluster-test.yaml*
 
     kubectl --namespace rook-ceph port-forward service/rook-ceph-mgr-dashboard 7000
 
@@ -311,7 +313,8 @@ Troubleshooting
 
 ### Deleteing Ceph Cluster
 
-If you need to remove the Ceph cluster for some reason you can follow the following instructions.
+If you need to remove the Ceph cluster for some reason you can follow the following
+instructions.
 
 - https://rook.io/docs/rook/v1.3/ceph-teardown.html
 
@@ -357,7 +360,8 @@ Check that it is all cleard up
 
     ansible -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory worker -a 'ls /var/lib/rook/'
 
-Lastly you need to reinitialize the block devices. This will depend on what type of device you have used.
+Lastly you need to reinitialize the block devices. This will depend on what type of device
+you have used.
 
 
 See the Troubleshooting section at the bottom of this page if you run into issues.
@@ -585,4 +589,4 @@ firewall-cmd --zone=libvirt --list-all
 
 
 
-<!-- vim: set ft=markdown ts=4 sw=4 tw=999 et :-->
+<!-- vim: set ft=markdown ts=4 sw=4 tw=90 et :-->
