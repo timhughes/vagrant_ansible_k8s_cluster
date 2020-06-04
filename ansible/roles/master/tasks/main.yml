@@ -41,23 +41,28 @@
   when:
     - not root_kube_conf.stat.exists
 
-- name: Copy join command to local file
+- name: Copy admin.conf file to local file ./kubeadmin.conf
   #become: false
-  local_action:
-    module: copy
-    content: /etc/kubernetes/admin.conf
+  fetch:
+    src: /etc/kubernetes/admin.conf
     dest: "../etc/kubeadmin.conf"
+    flat: "yes"
 
-- name: Check if Cilium kubeconfig exists
-  stat:
-    path: "/etc/cni/net.d/cilium-kubeconfig"
-  register: cilium_kubeconfig
+#- name: Check if Cilium kubeconfig exists
+#  stat:
+#    path: "/etc/cni/net.d/cilium-kubeconfig"
+#  register: cilium_kubeconfig
+
+- name: Check if Cilium is configured
+  command: kubectl get configmaps cilium-config -n kube-system
+  failed_when: false
+  changed_when: false
+  register: cilium_configured
 
 - name: Install Cilium pod network
   #become: false
   command: kubectl create -f https://raw.githubusercontent.com/cilium/cilium/{{ cilium_version }}/install/kubernetes/quick-install.yaml
-  when:
-    - not cilium_kubeconfig.stat.exists
+  when: cilium_configured.rc == 1
 
 - name: Generate join command
   command: kubeadm token create --print-join-command
@@ -65,8 +70,15 @@
   register: join_command
 
 - name: Copy join command to local file
-  #become: false
-  local_action:
-    module: copy
+  become: false
+  delegate_to: localhost
+  copy:
     content: "{{ join_command.stdout_lines[0] }}"
-    dest: "../join-command"
+    dest: "../tmp/join-command"
+
+#- name: Copy join command to local file
+#  local_action:
+#    module: copy
+#    content: "{{ join_command.stdout_lines[0] }}"
+#    dest: "./join-command"
+

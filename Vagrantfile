@@ -1,7 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-
 node_configs = [
   {role: 'master', qty: 1 },
   {role: 'worker', qty: 3},
@@ -13,7 +12,8 @@ role_spacer = 10
 
 Vagrant.configure("2") do |config|
 
-  config.vm.box = "timhughes/centos7"
+  #config.vm.box = "timhughes/centos7"
+  config.vm.box = "centos/7"
   config.vm.synced_folder ".",
     "/vagrant",
     type: "nfs",
