@@ -256,17 +256,16 @@ with the following command:
 ## Storage
 ### Deloying a Rook Ceph cluster
 
-The instructions are at https://rook.io/docs/rook/v1.1/ceph-quickstart.html
+The instructions are at https://rook.io/docs/rook/v1.3/ceph-quickstart.html
 
 In my experience the main thing that causes issues here is networking internally
 to kubernetes.
 
 The TL;DR for the rook quickstart is the following commands:
 
-
-    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.2/cluster/examples/kubernetes/ceph/common.yaml
-    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.2/cluster/examples/kubernetes/ceph/operator.yaml
-    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.2/cluster/examples/kubernetes/ceph/cluster-test.yaml
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/ceph/common.yaml
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/ceph/operator.yaml
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/ceph/cluster-test.yaml
 
 These take a little while to get bootstrapped. You can check the state of the pods using:
 
@@ -277,7 +276,7 @@ Once the Ceph cluster is running you can access it using the `kubectl proxy`:
 - http://localhost:8001/api/v1/namespaces/rook-ceph/services/https:rook-ceph-mgr-dashboard:8443/proxy/
 
 This is an example of application not working correctly using the proxy due to the way the Ceph
-Dashboard redirects on login we should use the port-forward method instead
+Dashboard redirects on login we should use the port-forward method instead.
 
     kubectl --namespace rook-ceph port-forward service/rook-ceph-mgr-dashboard 8443
 
