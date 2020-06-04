@@ -519,7 +519,16 @@ make this accessable from other machines in the network.
 
 This is not necessary for everything above but sometimes it is useful,
 especially because it is not simeple to copy files from a vagrant node to the
-host.
+host. These are the Vagrant docs for more details.
+
+- https://www.vagrantup.com/docs/synced-folders/nfs
+
+
+Inside the `Vagrantfile` you can share this directory with each of the nodes.
+The share is currently disabled so to activate it you need to edit the `Vagrantfile`
+and change the share to `disabled: false`
+
+#### Host NFS configuration
 
 To allow the users in the `wheel` group to configure NFS shares for vagrant
 create the file `/etc/sudoers.d/vagrant-syncedfolders` with the following
@@ -543,7 +552,7 @@ sudo chmod 644 /etc/sudoers.d/vagrant-syncedfolders
 sudo chown root.root /etc/sudoers.d/vagrant-syncedfolders
 ```
 
-### Firewall access for NFS
+#### Firewall access for NFS
 
 If you are having dificulty with NFS not mounting you may need to allow it
 through the firewall on the host.
