@@ -29,6 +29,8 @@ Vagrant.configure("2") do |config|
     libvirt.nested = true
     libvirt.graphics_type = 'spice'
     libvirt.video_type = 'virtio'
+    # Use QEMU system instead of session connection
+    libvirt.qemu_use_session = false
   end
 
   ansible_groups = {}
