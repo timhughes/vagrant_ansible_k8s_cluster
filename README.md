@@ -372,6 +372,11 @@ Delete the data on hosts
     ansible --become -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory worker -m file -a 'dest=/var/lib/rook/mon-b state=absent'
     ansible --become -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory worker -m file -a 'dest=/var/lib/rook/mon-c state=absent'
 
+
+    ansible --become -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory worker -a 'dd if=/dev/zero of="/dev/vdb" bs=1M count=200 oflag=direct,dsync'
+    ansible --become -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory worker -a 'bash -c "ls /dev/mapper/ceph-* | xargs -I% -- dmsetup remove %"'    ansible --become -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory worker -a 'rm -rf /dev/ceph-*'
+    ansible --become -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory worker -a 'lsblk'
+
 Check that it is all cleard up
 
     ansible -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory worker -a 'ls /var/lib/rook/'
