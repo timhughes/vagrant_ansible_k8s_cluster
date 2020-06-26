@@ -374,7 +374,8 @@ Delete the data on hosts
 
 
     ansible --become -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory worker -a 'dd if=/dev/zero of="/dev/vdb" bs=1M count=200 oflag=direct,dsync'
-    ansible --become -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory worker -a 'bash -c "ls /dev/mapper/ceph-* | xargs -I% -- dmsetup remove %"'    ansible --become -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory worker -a 'rm -rf /dev/ceph-*'
+    ansible --become -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory worker -a 'bash -c "ls /dev/mapper/ceph-* | xargs -I% -- dmsetup remove %"'
+    ansible --become -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory worker -a 'rm -rf /dev/ceph-*'
     ansible --become -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory worker -a 'lsblk'
 
 Check that it is all cleard up
