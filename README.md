@@ -37,6 +37,7 @@ Interface] (CNI)
 [Creating a single control-plane cluster with kubeadm]: https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/
 [Docker Container Runtime Interface]: https://kubernetes.io/docs/setup/production-environment/container-runtimes/#docker
 [Calico Container Network Interface]: https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#pod-network
+[patches]: https://src.fedoraproject.org/rpms/vagrant-libvirt/blob/master/f/vagrant-libvirt-0.0.45-enable-qemu-session-by-default.patch
 
 There are multiple assumptions for this walkthough based on my personal setup. You may
 need to adjust to suit.
@@ -57,7 +58,7 @@ sudo dnf -y install vagrant vagrant-libvirt ansible
 sudo systemctl enable --now libvirtd.service
 ```
 
-Fedora patches *vagrant-libvirt* to use `qemu:///session` which uses a userland networking
+Fedora [patches] *vagrant-libvirt* to use `qemu:///session` which uses a userland networking
 system. This breaks `private_network` in vagrant-libvirt. In the `Vagrantfile` this is set
 to use `qemu:///system`. If you want to see the machines using the `virsh` command you
 can either add the option `--connect` to your *virsh* command:
