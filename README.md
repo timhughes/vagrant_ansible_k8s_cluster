@@ -353,7 +353,10 @@ Delete the Block and File artifacts
 Delete the CephCluster CRD. If you used **cluster-test.yaml** the cluster name
 is `my-cluster`, if you used **cluster.yaml** it is named `rook-ceph`
 
+    # Pick the correct one of these!!!
     kubectl -n rook-ceph delete cephcluster my-cluster
+    # or 
+    kubectl -n rook-ceph delete cephcluster rook-ceph
 
 Verify that the pods and cluster CRD has been deleted before continuing to the next step.
 
