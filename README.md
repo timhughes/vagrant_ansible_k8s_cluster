@@ -355,13 +355,37 @@ is `my-cluster`, if you used **cluster.yaml** it is named `rook-ceph`
 
     # Pick the correct one of these!!!
     kubectl -n rook-ceph delete cephcluster my-cluster
-    # or 
+    # or
     kubectl -n rook-ceph delete cephcluster rook-ceph
 
 Verify that the pods and cluster CRD has been deleted before continuing to the next step.
 
-    kubectl -n rook-ceph get pod
     kubectl -n rook-ceph get cephcluster
+
+When verifing the pods you will still see the operator pods but all the `rook-ceph-mon`,
+`rook-ceph-mgr` and `rook-ceph-osd` should be gone.
+
+    kubectl -n rook-ceph get pod
+
+Your output should look similar to this.
+
+    NAME                                            READY   STATUS    RESTARTS   AGE
+    csi-cephfsplugin-2lmpg                          3/3     Running   0          38m
+    csi-cephfsplugin-5wglt                          3/3     Running   0          38m
+    csi-cephfsplugin-ck9qg                          3/3     Running   0          38m
+    csi-cephfsplugin-provisioner-7469b99d4b-wnwh5   5/5     Running   0          38m
+    csi-cephfsplugin-provisioner-7469b99d4b-ztkl9   5/5     Running   0          38m
+    csi-rbdplugin-9xjzm                             3/3     Running   0          38m
+    csi-rbdplugin-dtmvs                             3/3     Running   0          38m
+    csi-rbdplugin-provisioner-865f4d8d-jvxdk        6/6     Running   0          38m
+    csi-rbdplugin-provisioner-865f4d8d-xb9vd        6/6     Running   0          38m
+    csi-rbdplugin-rkrqk                             3/3     Running   0          38m
+    rook-ceph-operator-5b6674cb6-qhcjj              1/1     Running   0          38m
+    rook-discover-2mcmh                             1/1     Running   0          38m
+    rook-discover-2tnhq                             1/1     Running   0          38m
+    rook-discover-8cf4w                             1/1     Running   0          38m
+
+
 
 Delete the Operator and related Resources
 
