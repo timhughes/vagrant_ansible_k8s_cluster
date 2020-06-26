@@ -392,25 +392,29 @@ Delete the Operator and related Resources
     kubectl delete -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/ceph/operator.yaml
     kubectl delete -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/ceph/common.yaml
 
-Delete the data on hosts
+Check that all the operator pods get deleted and there is nothing left in the `rook-ceph`
+namespace.
+
+    kubectl -n rook-ceph get all
+
+
+Delete the metadata on hosts.
 
     ansible --become -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory worker -m file -a 'dest=/var/lib/rook/rook-ceph state=absent'
     ansible --become -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory worker -m file -a 'dest=/var/lib/rook/mon-a state=absent'
     ansible --become -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory worker -m file -a 'dest=/var/lib/rook/mon-b state=absent'
     ansible --become -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory worker -m file -a 'dest=/var/lib/rook/mon-c state=absent'
 
+Wipe the disks and reinitialize the block devices.
 
-    ansible --become -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory worker -a 'dd if=/dev/zero of="/dev/vdb" bs=1M count=200 oflag=direct,dsync'
+    ansible --become -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory worker -a 'dd if=/dev/zero of="/dev/vdb" bs=1M count=100 oflag=direct,dsync'
     ansible --become -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory worker -a 'bash -c "ls /dev/mapper/ceph-* | xargs -I% -- dmsetup remove %"'
     ansible --become -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory worker -a 'rm -rf /dev/ceph-*'
     ansible --become -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory worker -a 'lsblk'
 
-Check that it is all cleard up
+Check that it is all cleared up.
 
     ansible -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory worker -a 'ls /var/lib/rook/'
-
-Lastly you need to reinitialize the block devices. This will depend on what type of device
-you have used.
 
 
 See the Troubleshooting section at the bottom of this page if you run into issues.
