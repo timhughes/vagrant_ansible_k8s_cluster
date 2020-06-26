@@ -47,17 +47,32 @@ need to adjust to suit.
 
 ## Setup
 
-Install vagrant and vagrant-libvirt from the standard repos then start the libvirtd service.
+Install vagrant and vagrant-libvirt and ansible from the standard repos then start the libvirtd service.
 
 ```
 sudo dnf -y groupinstall virtualization
-sudo dnf -y install vagrant vagrant-libvirt
+sudo dnf -y install vagrant vagrant-libvirt ansible
 ```
 ```
 sudo systemctl enable --now libvirtd.service
 ```
 
+Fedora patches *vagrant-libvirt* to use `qemu:///session` which uses a userland networking
+system. This breaks `private_network` in vagrant-libvirt. In the `Vagrantfile` this is set
+to use `qemu:///system`. If you want to see the machines using the `virsh` command you
+can either add the option `--connect` to your *virsh* command:
 
+```
+virsh --connect=qemu:///system list --all
+```
+
+Or you can set and environment variable.
+
+```
+export LIBVIRT_DEFAULT_URI=qemu:///system
+```
+
+To make this permanent you can add the above export command to your `~/.bashrc`
 
 
 ### Polkit access for `wheel` users to manage libvirt.
