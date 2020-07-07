@@ -43,16 +43,16 @@
 
 # Cilium requires kernel version is >= 4.8.0 - maybe someday :-(
 # https://github.com/timhughes/vagrant_ansible_k8s_cluster/issues/4
-#- name: Check if Cilium is configured
-#  command: kubectl get configmaps cilium-config -n kube-system
-#  failed_when: false
-#  changed_when: false
-#  register: cilium_configured
+# - name: Check if Cilium is configured
+#   command: kubectl get configmaps cilium-config -n kube-system
+#   failed_when: false
+#   changed_when: false
+#   register: cilium_configured
 #
-#- name: Install Cilium pod network
-#  #become: false
-#  command: kubectl create -f https://raw.githubusercontent.com/cilium/cilium/{{ cilium_version }}/install/kubernetes/quick-install.yaml
-#  when: cilium_configured.rc == 1
+# - name: Install Cilium pod network
+#   #become: false
+#   command: kubectl create -f https://raw.githubusercontent.com/cilium/cilium/{{ cilium_version }}/install/kubernetes/quick-install.yaml
+#   when: cilium_configured.rc == 1
 
 - name: Generate join command
   command: kubeadm token create --print-join-command
