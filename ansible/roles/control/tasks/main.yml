@@ -4,8 +4,11 @@
     path: "/var/lib/kubelet/config.yaml"
   register: kubeadm_already_run
 
+- debug:
+    msg: "kubeadm init {{ '--control-plane-endpoint ' + control_plane_endpoint if control_plane_endpoint is defined }} {{ '--pod-network-cidr ' + pod_network_cidr if pod_network_cidr is defined }} --upload-certs"
+
 - name: Initialize the Kubernetes cluster using kubeadm
-  command: kubeadm init --pod-network-cidr={{ pod_network_cidr }}
+  command: "kubeadm init {{ '--control-plane-endpoint ' + control_plane_endpoint if control_plane_endpoint is defined }} {{ '--pod-network-cidr ' + pod_network_cidr if pod_network_cidr is defined }} --upload-certs"
   when:
     - not kubeadm_already_run.stat.exists
 
@@ -55,7 +58,21 @@
   command: kubeadm token create --print-join-command
   register: join_command
 
-- name: Copy join command to local file
+- name: Set certificate_key
+  set_fact:
+    certificate_key: "{{ lookup('password', '/dev/null length=64 chars=hexdigits') }}"
+
+- name: Reupload certs with known certificate_key
+  command: "kubeadm init phase upload-certs --upload-certs --certificate-key {{  certificate_key }}"
+
+- name: Copy control join command to local file
+  become: false
+  delegate_to: localhost
+  copy:
+    content: "{{ join_command.stdout_lines[0] + ' --control-plane --certificate-key ' + certificate_key}}"
+    dest: "../tmp/control-join-command"
+
+- name: Copy worker join command to local file
   become: false
   delegate_to: localhost
   copy:

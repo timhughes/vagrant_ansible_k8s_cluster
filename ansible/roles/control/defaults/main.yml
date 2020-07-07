@@ -1,0 +1,6 @@
+---
+pod_network_cidr: 172.16.0.0/16  # Calico can be any range but a /16 is good
+calico_version: v3.14
+control_plane_endpoint: "api"
+# pod_network_cidr: 10.217.0.0/16  # Cilium - it has to be this
+# cilium_version: v1.6

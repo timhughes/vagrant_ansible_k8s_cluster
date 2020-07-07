@@ -576,6 +576,42 @@ make this accessable from other machines in the network.
 [MetalLB compatibility docs]: https://metallb.universe.tf/installation/
 
 
+## Cron Jobs
+
+Kubernetes has a built in cron for running batch jobs at regular intervals.
+
+Run the following to create an example cronjob:
+
+    kubectl create -f https://k8s.io/examples/application/job/cronjob.yaml
+
+This creates a cronjob that will launch a busybox container every minute with the command
+`/bin/sh -c 'date; echo Hello from the Kubernetes cluster'`
+
+You can examine the cronjob with kubectl or look at it in the dashboard.
+
+```
+$ kubectl get cronjobs
+NAME    SCHEDULE      SUSPEND   ACTIVE   LAST SCHEDULE   AGE
+hello   */1 * * * *   False     0        47s             7m36s
+```
+
+```
+$ kubectl get jobs
+NAME               COMPLETIONS   DURATION   AGE
+hello-1594160340   1/1           9s         2m33s
+hello-1594160400   1/1           8s         101s
+hello-1594160460   1/1           7s         39s
+```
+
+The logs are available like for any other container.
+
+```
+$ kubectl logs job/hello-1594160400
+Tue Jul  7 22:20:07 UTC 2020
+Hello from the Kubernetes cluster
+```
+
+
 ## Extras
 
 ### Set up Vagrant NFS shares.

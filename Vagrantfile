@@ -2,7 +2,7 @@
 # vi: set ft=ruby :
 
 node_configs = [
-  {role: 'master', qty: 1 },
+  {role: 'control', qty: 3},
   {role: 'worker', qty: 3},
 ]
 
@@ -35,6 +35,25 @@ Vagrant.configure("2") do |config|
 
   ansible_groups = {}
 
+
+  config.vm.define :lb, autostart: false do |node|
+    #node.vm.box = "centos/7"
+    node.vm.network :private_network,
+      :libvirt__network_name => 'kube-internal',
+      :libvirt__dhcp_enabled => false,
+      :ip => "192.168.200.2"
+    node.vm.provider :libvirt do |libvirt|
+      libvirt.cpus = 2
+      libvirt.memory = 2048
+    end
+    node.vm.provision "ansible" do |ansible|
+      ansible.playbook = "ansible/lb.yml"
+    end
+  end
+
+
+
+
   node_configs.each_with_index  do |node_conf, i|
     role_num = i+1 # dont want multiply by zero later
     if node_conf[:qty] > role_spacer
@@ -51,18 +70,21 @@ Vagrant.configure("2") do |config|
           ansible_groups[node_conf[:role]] = [hostname]
         end
         node.vm.hostname = hostname
-        node.vm.network "private_network", ip: "192.168.200.#{id}" #, libvirt__forward_mode: 'route'
+        node.vm.network "private_network",
+          :libvirt__network_name => 'kube-internal',
+          ip: "192.168.200.#{id}"
         node.vm.provision "shell", inline: 'sed -i "/$HOSTNAME/d" /etc/hosts'
         if node_conf[:role].eql?('worker')
           node.vm.provider :libvirt do |libvirt|
             libvirt.storage :file, :size => '40G'
           end
         end
+
+        node.vm.provision "ansible" do |ansible|
+          ansible.playbook = "ansible/playbook.yml"
+          ansible.groups = ansible_groups
+        end
       end
     end
-  end
-  config.vm.provision "ansible" do |ansible|
-    ansible.playbook = "ansible/playbook.yml"
-    ansible.groups = ansible_groups
   end
 end

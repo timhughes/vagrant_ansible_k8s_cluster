@@ -65,6 +65,21 @@
     - net.bridge.bridge-nf-call-ip6tables
     - net.bridge.bridge-nf-call-iptables
 
+- name: Use dnsmasq before falling back to dhcp provided dns
+  copy:
+    dest: "/etc/dhcp/dhclient.conf"
+    content: |
+      supersede domain-search "kube1.vm.test";
+      prepend domain-name-servers 192.168.200.2;
+  when: '"192.168.200.2" not in ansible_dns.nameservers'
+  register: dhclient_dns
+
+- name: Restart NetworkManager if dhclient.conf changed
+  service:
+    name: NetworkManager
+    state: restarted
+  when: dhclient_dns.changed
+
 - import_tasks: install.yml
   tags:
     - kubelet

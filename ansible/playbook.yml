@@ -5,10 +5,10 @@
     - common
     - docker
     - kube_node
-- hosts: master
-  become: true
-  roles:
-    - master
+#- hosts: control
+#  become: true
+#  roles:
+#    - control
 - hosts: worker
   become: true
   roles:
