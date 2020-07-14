@@ -31,6 +31,7 @@ Vagrant.configure("2") do |config|
     libvirt.video_type = 'virtio'
     # Use QEMU system instead of session connection
     libvirt.qemu_use_session = false
+    libvirt.suspend_mode = 'managedsave'
   end
 
   ansible_groups = {}
