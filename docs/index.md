@@ -141,7 +141,7 @@ Next see how the kubernetes cluster is running:
 Make sure that none of the pods are all in `Running` state. If you have some
 that are in a `CrashLoopBackOff` state you should investigate the logs.
 
-    kubectl logs -n kube-system pod/etcd-master-11
+    kubectl logs -n kube-system pod/etcd-control-11
 
 
 ## Checking if your cluster is correctly running.
