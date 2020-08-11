@@ -78,6 +78,8 @@ Create a user and get the user creds
 ```
 kubectl create -f https://github.com/rook/rook/raw/master/cluster/examples/kubernetes/ceph/object-user.yaml
 ```
+<!-- TODO: is both endpoint and host needed ??? -->
+
 ```
 (
     echo export AWS_ENDPOINT=$(kubectl -n rook-ceph get service/rook-ceph-rgw-my-store -o jsonpath='{range .spec}{@.clusterIP}{":"}{@.ports[0].port}{"\n"}{end}')
