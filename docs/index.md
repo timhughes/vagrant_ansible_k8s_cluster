@@ -238,6 +238,7 @@ which you should read for further details.
 
 
 Download and install kube-prometheus
+:bulb: https://github.com/prometheus-operator/kube-prometheus/pull/641#issuecomment-671835399
 
     git clone https://github.com/coreos/kube-prometheus tmp/kube-prometheus
     kubectl create -f tmp/kube-prometheus/manifests/setup
@@ -302,6 +303,11 @@ more detail at the quickstart link above and use this `cluster.yaml`
 These take a little while to get bootstrapped. You can check the state of the pods using:
 
     kubectl  get all -n rook-ceph
+
+:bulb: I think this is formatting disks and the like. With 3 worker nodes and 40GB file backed disks on NVMe
+it takes about 30 minutes. I havent worked exactly what to check but trhere is probably
+something useful in `kubectl -n rook-ceph logs deployment.apps/rook-ceph-operator`
+
 
 Once the Ceph cluster is running you can access it using the `kubectl proxy` Use port
 `https:rook-ceph-mgr-dashboard:8443` (because dashboard is already on 8443) if you used
