@@ -1,9 +1,9 @@
 
 Create an CephObjectStore, erasure encoded StorageClass with a reclaim policy of delete, ObjectBucketClaim and a CephObjectStoreUser
 ```
-kubectl create -f https://github.com/rook/rook/rook/release-1.4/cluster/examples/kubernetes/ceph/object-ec.yaml
-kubectl create -f https://github.com/rook/rook/rook/release-1.4/cluster/examples/kubernetes/ceph/storageclass-bucket-delete.yaml
-kubectl create -f https://github.com/rook/rook/rook/release-1.4/cluster/examples/kubernetes/ceph/object-bucket-claim-delete.yaml
+kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.4/cluster/examples/kubernetes/ceph/object-ec.yaml
+kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.4/cluster/examples/kubernetes/ceph/storageclass-bucket-delete.yaml
+kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.4/cluster/examples/kubernetes/ceph/object-bucket-claim-delete.yaml
 ```
 
 Get the s3 details as seen inside the cluster
@@ -47,7 +47,7 @@ external access
 
 
 
-kubectl create -f https://github.com/rook/rook/rook/release-1.4/cluster/examples/kubernetes/ceph/rgw-external.yaml
+kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.4/cluster/examples/kubernetes/ceph/rgw-external.yaml
 
 Find out what port the nodePort has ended up on
 ```
@@ -76,7 +76,7 @@ like
 
 Create a user and get the user creds
 ```
-kubectl create -f https://github.com/rook/rook/rook/release-1.4/cluster/examples/kubernetes/ceph/object-user.yaml
+kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.4/cluster/examples/kubernetes/ceph/object-user.yaml
 ```
 <!-- TODO: is both endpoint and host needed ??? -->
 
