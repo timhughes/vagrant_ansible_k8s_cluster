@@ -288,17 +288,17 @@ kubernetes.
 
 The TL;DR for the rook quickstart is the following commands:
 
-    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/ceph/common.yaml
-    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/ceph/operator.yaml
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.4/cluster/examples/kubernetes/ceph/common.yaml
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.4/cluster/examples/kubernetes/ceph/operator.yaml
 
 
 
-    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/ceph/cluster-test.yaml
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.4/cluster/examples/kubernetes/ceph/cluster-test.yaml
 
 If you want a production cluster then you need  In this case you should read the docs in
 more detail at the quickstart link above and use this `cluster.yaml`
 
-    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/ceph/cluster.yaml
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.4/cluster/examples/kubernetes/ceph/cluster.yaml
 
 These take a little while to get bootstrapped. You can check the state of the pods using:
 
@@ -345,15 +345,15 @@ Here is the TL:DR
 First you need to delete any persistant volumes and claims. If you have done the
 wordpress example the these are the commands
 
-    kubectl delete -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/mysql.yaml
-    kubectl delete -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/wordpress.yaml
+    kubectl delete -f https://raw.githubusercontent.com/rook/rook/release-1.4/cluster/examples/kubernetes/mysql.yaml
+    kubectl delete -f https://raw.githubusercontent.com/rook/rook/release-1.4/cluster/examples/kubernetes/wordpress.yaml
 
 
 Delete the Block and File artifacts
 
     kubectl delete -n rook-ceph cephblockpool replicapool
     kubectl delete storageclass rook-ceph-block
-    kubectl delete -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/ceph/csi/cephfs/kube-registry.yaml
+    kubectl delete -f https://raw.githubusercontent.com/rook/rook/release-1.4/cluster/examples/kubernetes/ceph/csi/cephfs/kube-registry.yaml
     kubectl delete storageclass csi-cephfs
 
 Delete the CephCluster CRD. If you used **cluster-test.yaml** the cluster name
@@ -395,8 +395,8 @@ Your output should look similar to this.
 
 Delete the Operator and related Resources
 
-    kubectl delete -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/ceph/operator.yaml
-    kubectl delete -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/ceph/common.yaml
+    kubectl delete -f https://raw.githubusercontent.com/rook/rook/release-1.4/cluster/examples/kubernetes/ceph/operator.yaml
+    kubectl delete -f https://raw.githubusercontent.com/rook/rook/release-1.4/cluster/examples/kubernetes/ceph/common.yaml
 
 Check that all the operator pods get deleted and there is nothing left in the `rook-ceph`
 namespace.
@@ -437,7 +437,7 @@ Remember to change to the page that matches the version you have installed.
 
 Here is a TL;DR for rook-ceph-toolbox:
 
-    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/ceph/toolbox.yaml
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.4/cluster/examples/kubernetes/ceph/toolbox.yaml
     kubectl -n rook-ceph get pod -l "app=rook-ceph-tools"
     kubectl -n rook-ceph exec -it $(kubectl -n rook-ceph get pod -l "app=rook-ceph-tools" -o jsonpath='{.items[0].metadata.name}') -- bash
 
@@ -459,21 +459,21 @@ The following will create a `rook-ceph-block` StorageClass which can be used by
 applications. These will be ext4 by default so if you want to change it then
 download the yamls and edit before creating.
 
-There are 2 different yamls available at https://github.com/rook/rook/tree/release-1.3/cluster/examples/kubernetes/ceph/csi/rbd
+There are 2 different yamls available at https://github.com/rook/rook/tree/release-1.4/cluster/examples/kubernetes/ceph/csi/rbd
 `storageclass.yaml` which requres 3 replicas and `storageclass-test.yaml` which
 is designed for testing on a single node. Pick one and create it.
 
-    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/ceph/csi/rbd/storageclass.yaml
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.4/cluster/examples/kubernetes/ceph/csi/rbd/storageclass.yaml
 
 or
 
-    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/ceph/csi/rbd/storageclass-test.yaml
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.4/cluster/examples/kubernetes/ceph/csi/rbd/storageclass-test.yaml
 
 
 Some sample apps are provided with rook for testing.
 
-    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/mysql.yaml
-    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.3/cluster/examples/kubernetes/wordpress.yaml
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.4/cluster/examples/kubernetes/mysql.yaml
+    kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.4/cluster/examples/kubernetes/wordpress.yaml
 
 
 You can see the state of the apps using `kubectl get all` as these will be
