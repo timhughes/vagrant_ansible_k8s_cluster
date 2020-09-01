@@ -20,7 +20,7 @@ Get the s3 details as seen inside the cluster
 To test we can just run a container in the foreground
 
 ```
-kubectl run --interactive --tty --rm --image=centos:8 centos8
+kubectl run -i --tty --rm --image=centos:8 centos8
 ```
 
 ```
@@ -46,8 +46,10 @@ Hello Rook
 external access
 
 
-
 kubectl create -f https://raw.githubusercontent.com/rook/rook/release-1.4/cluster/examples/kubernetes/ceph/rgw-external.yaml
+
+If you want to use a LoadBalancer then download the file and change `NodePort` to
+`LoadBalancer`
 
 Find out what port the nodePort has ended up on
 ```
@@ -90,17 +92,17 @@ export AWS_HOST=xxx.xxx.xxx.xxx:31948
 ```
 
 ```
-s3cmd --host=192.168.121.113:31948 --no-ssl --host-bucket= mb s3://foo
-s3cmd --host=192.168.121.113:31948 --no-ssl ls
+s3cmd --host=${AWS_HOST} --no-ssl --host-bucket= mb s3://foo
+s3cmd --host=${AWS_HOST} --no-ssl ls
 
-s3cmd --no-ssl --host=192.168.121.113:31948 --host-bucket= put /tmp/rookObj s3://foo
+s3cmd --host=${AWS_HOST} --no-ssl --host-bucket= put /tmp/rookObj s3://foo
 upload: '/tmp/rookObj' -> 's3://foo/rookObj'  [1 of 1]
  11 of 11   100% in    0s   119.15 B/s  done
 
-s3cmd --no-ssl --host=192.168.121.113:31948 --host-bucket=  ls s3://foo
+s3cmd --host=${AWS_HOST} --no-ssl --host-bucket=  ls s3://foo
 2020-08-11 01:15           11  s3://foo/rookObj
 
-s3cmd --no-ssl --host=192.168.121.113:31948 --host-bucket= get s3://foo/rookObj
+s3cmd --host=${AWS_HOST} --no-ssl --host-bucket= get s3://foo/rookObj
 download: 's3://foo/rookObj' -> './rookObj'  [1 of 1]
  11 of 11   100% in    0s     3.53 KB/s  done
 ```
