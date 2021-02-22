@@ -12,7 +12,7 @@ role_spacer = 10
 
 Vagrant.configure("2") do |config|
 
-  config.vm.box = "centos/7"
+  config.vm.box = "centos/8"
 
   # Deliberatly disabled as it is not needed. Change `disabled: true`
   # to `disabled: false` if you would like to use NFS shares or you can
@@ -38,11 +38,10 @@ Vagrant.configure("2") do |config|
 
 
   config.vm.define :lb, autostart: false do |node|
-    #node.vm.box = "centos/7"
     node.vm.network :private_network,
-      :libvirt__network_name => 'kube-internal',
-      :libvirt__dhcp_enabled => false,
-      :ip => "192.168.200.2"
+      libvirt__network_name: 'kube-internal',
+      libvirt__dhcp_enabled: false,
+      ip: "192.168.200.2"
     node.vm.provider :libvirt do |libvirt|
       libvirt.cpus = 2
       libvirt.memory = 2048
@@ -56,15 +55,14 @@ Vagrant.configure("2") do |config|
 
 
   node_configs.each_with_index  do |node_conf, i|
-    role_num = i+1 # dont want multiply by zero later
+    role_num = i * role_spacer + role_spacer
     if node_conf[:qty] > role_spacer
       puts "ERROR: Role #{node_conf[:role]} has 'qty' of  #{node_conf[:qty]} greater than #{role_spacer} (role_spacer)"
       abort
     end
-    (1..(node_conf[:qty])).each do |node_num|
-      id = role_spacer*role_num+node_num
-      config.vm.define "#{node_conf[:role]}-#{id}" do |node|
-        hostname = "#{node_conf[:role]}-#{id}"
+    (0..(node_conf[:qty]-1)).each do |node_num|
+      config.vm.define "#{node_conf[:role]}-#{node_num}" do |node|
+        hostname = "#{node_conf[:role]}-#{node_num}"
         if ansible_groups.key?(node_conf[:role])
           ansible_groups[node_conf[:role]] << hostname
         else
@@ -72,8 +70,9 @@ Vagrant.configure("2") do |config|
         end
         node.vm.hostname = hostname
         node.vm.network "private_network",
-          :libvirt__network_name => 'kube-internal',
-          ip: "192.168.200.#{id}"
+          libvirt__network_name: 'kube-internal',
+          libvirt__dhcp_enabled: false,
+          ip: "192.168.200.#{role_num+node_num}"
         node.vm.provision "shell", inline: 'sed -i "/$HOSTNAME/d" /etc/hosts'
         if node_conf[:role].eql?('worker')
           node.vm.provider :libvirt do |libvirt|
@@ -82,7 +81,7 @@ Vagrant.configure("2") do |config|
         end
 
         node.vm.provision "ansible" do |ansible|
-          ansible.playbook = "ansible/playbook.yml"
+          ansible.playbook = "ansible/vagrant.yml"
           ansible.groups = ansible_groups
         end
       end

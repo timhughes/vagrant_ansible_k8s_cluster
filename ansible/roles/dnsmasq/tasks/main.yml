@@ -7,7 +7,7 @@
   vars:
     packages:
       - dnsmasq
-      - NetworkManager-glib
+        #- NetworkManager-glib
 
 - name: Copy in dnsmasq config
   copy:
@@ -15,7 +15,7 @@
     dest: /etc/dnsmasq.d/kubernetes.conf
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   notify:
     - restart_dnsmasq
 
@@ -26,7 +26,6 @@
     state: started
     enabled: "yes"
 
-
 - name: Use dnsmasq before falling back to dhcp provided dns
   copy:
     dest: "/etc/dhcp/dhclient.conf"
@@ -34,5 +33,15 @@
       supersede domain-search "kube1.vm.test";
       prepend domain-name-servers 127.0.0.1;
   when: '"127.0.0.1" not in ansible_dns.nameservers'
+  notify:
+    - restart_NetworkManager
+
+- name: Change NM to use dhclient
+  copy:
+    src: nm-dhclient.conf
+    dest: /etc/NetworkManager/conf.d/nm-dhclient.conf
+    owner: root
+    group: root
+    mode: "0644"
   notify:
     - restart_NetworkManager

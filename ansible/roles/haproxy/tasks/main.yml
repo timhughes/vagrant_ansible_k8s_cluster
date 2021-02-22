@@ -7,8 +7,8 @@
   vars:
     packages:
       - haproxy
-      - libselinux-python
-      - libsemanage-python
+      - python3-libselinux
+      - python3-libsemanage
 
 - name: Copy in haproxy config
   copy:
@@ -16,7 +16,7 @@
     dest: /etc/haproxy/haproxy.cfg
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   notify:
     - restart_haproxy
 
