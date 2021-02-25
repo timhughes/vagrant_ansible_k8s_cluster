@@ -1,0 +1,51 @@
+---
+# https://kubernetes.io/docs/setup/production-environment/container-runtimes/#docker
+
+- name: Install required packages.
+  dnf:
+    name: "{{ packages }}"
+    state: present
+    update_cache: "yes"
+  vars:
+    packages:
+      - device-mapper-persistent-data
+      - lvm2
+      - yum-utils
+
+- name: Add yum repository for Libcontainers
+  yum_repository:
+    name: devel:kubic:libcontainers:stable
+    description: devel:kubic:libcontainers:stable (CentOS_$releasever)
+    baseurl: https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/CentOS_$releasever/
+    gpgcheck: "yes"
+    gpgkey: https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/CentOS_$releasever/repodata/repomd.xml.key
+    state: present
+    enabled: "no"
+
+- name: Add yum repository for CRI-O
+  yum_repository:
+    name: devel:kubic:libcontainers:stable:cri-o:1.20
+    description: devel:kubic:libcontainers:stable:cri-o:1.20 (CentOS_8)
+    baseurl: https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/1.20/CentOS_$releasever/
+    gpgcheck: "yes"
+    gpgkey: https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/1.20/CentOS_$releasever/repodata/repomd.xml.key
+    state: present
+    enabled: "no"
+
+- name: Install CRI-O
+  dnf:
+    name: "{{ packages }}"
+    state: present
+    enablerepo: devel:kubic:libcontainers:stabler,devel:kubic:libcontainers:stable:cri-o:1.20
+  vars:
+    packages:
+      - cri-o
+  notify:
+    - crio status
+
+- name: Start service docker, if not started
+  service:
+    name: crio
+    daemon_reload: "yes"
+    state: started
+    enabled: "yes"

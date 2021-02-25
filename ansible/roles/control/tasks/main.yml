@@ -5,7 +5,7 @@
   register: kubeadm_already_run
 
 - debug:
-    msg: "kubeadm init {{ '--control-plane-endpoint ' + control_plane_endpoint if control_plane_endpoint is defined }} {{ '--pod-network-cidr ' + pod_network_cidr if pod_network_cidr is defined }} --upload-certs --config /tmp/kubeadmin-init.conf"
+    msg: "kubeadm init {{ '--control-plane-endpoint ' + control_plane_endpoint if control_plane_endpoint is defined }} {{ '--pod-network-cidr ' + pod_network_cidr if pod_network_cidr is defined }} --upload-certs"
 
 - name: Initialize the Kubernetes cluster using kubeadm
   command: "kubeadm init {{ '--control-plane-endpoint ' + control_plane_endpoint if control_plane_endpoint is defined }} {{ '--pod-network-cidr ' + pod_network_cidr if pod_network_cidr is defined }} --upload-certs"
