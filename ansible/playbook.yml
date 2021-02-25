@@ -3,12 +3,12 @@
   become: true
   roles:
     - common
-    - docker
+    - crio
     - kube_node
 - hosts: control
   become: true
   roles:
-    #- control
+    - control
 - hosts: worker
   become: true
   roles:

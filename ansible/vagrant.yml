@@ -3,6 +3,9 @@
   become: true
   roles:
     - common
-    #- docker
-    #- kube_node
-
+    - crio
+    - kube_node
+- hosts: control-0
+  become: true
+  roles:
+    - control

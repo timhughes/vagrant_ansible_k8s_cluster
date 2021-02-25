@@ -32,7 +32,6 @@
     content: |
       supersede domain-search "kube1.vm.test";
       prepend domain-name-servers 127.0.0.1;
-  when: '"127.0.0.1" not in ansible_dns.nameservers'
   notify:
     - restart_NetworkManager
 
@@ -45,3 +44,9 @@
     mode: "0644"
   notify:
     - restart_NetworkManager
+
+- name: Restart NetworkManager if 127.0.0.1 not in nameservers
+  service:
+    name: NetworkManager
+    state: restarted
+  when: '"127.0.0.1" not in ansible_dns.nameservers'

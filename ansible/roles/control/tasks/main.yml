@@ -5,7 +5,7 @@
   register: kubeadm_already_run
 
 - debug:
-    msg: "kubeadm init {{ '--control-plane-endpoint ' + control_plane_endpoint if control_plane_endpoint is defined }} {{ '--pod-network-cidr ' + pod_network_cidr if pod_network_cidr is defined }} --upload-certs"
+    msg: "kubeadm init {{ '--control-plane-endpoint ' + control_plane_endpoint if control_plane_endpoint is defined }} {{ '--pod-network-cidr ' + pod_network_cidr if pod_network_cidr is defined }} --upload-certs --config /tmp/kubeadmin-init.conf"
 
 - name: Initialize the Kubernetes cluster using kubeadm
   command: "kubeadm init {{ '--control-plane-endpoint ' + control_plane_endpoint if control_plane_endpoint is defined }} {{ '--pod-network-cidr ' + pod_network_cidr if pod_network_cidr is defined }} --upload-certs"
@@ -37,7 +37,8 @@
   register: calico_kubeconfig
 
 - name: Install calico pod network
-  command: kubectl create -f https://docs.projectcalico.org/{{ calico_version }}/manifests/calico.yaml
+  #command: kubectl create -f https://docs.projectcalico.org/{{ calico_version }}/manifests/calico.yaml
+  command: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
   when:
     - not calico_kubeconfig.stat.exists
 

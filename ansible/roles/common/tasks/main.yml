@@ -20,8 +20,9 @@
       - device-mapper-persistent-data
       - lvm2
       - git
+      - iproute-tc
 
 - name: upgrade all packages
   yum:
-    name: '*'
+    name: "*"
     state: latest

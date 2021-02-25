@@ -8,30 +8,43 @@
     - swap
     - none
 
-
 - name: Disable swap
   command: swapoff -a
   when: ansible_swaptotal_mb > 0
-
 
 - name: Permissive SELinux
   selinux:
     policy: targeted
     state: permissive
 
-
-- name: Verify if br_netfilter module exists
-  shell: "modinfo br_netfilter"
-  environment:
-    PATH: "{{ ansible_env.PATH }}:/sbin"  # Make sure we can workaround RH's conservative path management
-  register: modinfo_br_netfilter
-  failed_when: modinfo_br_netfilter.rc not in [0, 1]
-  changed_when: false
-
-- name: Verify br_netfilter module path exists
+- name: Verify module path exists
   file:
     path: /etc/modules-load.d
     state: directory
+
+- name: Verify if overlay module exists
+  shell: "modinfo overlay"
+  register: modinfo_overlay
+  failed_when: modinfo_overlay.rc not in [0, 1]
+  changed_when: false
+
+- name: Enable overlay module
+  modprobe:
+    name: overlay
+    state: present
+  when: modinfo_overlay.rc == 0
+
+- name: Persist overlay module
+  copy:
+    dest: /etc/modules-load.d/overlay.conf
+    content: overlay
+  when: modinfo_overlay.rc == 0
+
+- name: Verify if br_netfilter module exists
+  shell: "modinfo br_netfilter"
+  register: modinfo_br_netfilter
+  failed_when: modinfo_br_netfilter.rc not in [0, 1]
+  changed_when: false
 
 - name: Enable br_netfilter module
   modprobe:
@@ -44,7 +57,6 @@
     dest: /etc/modules-load.d/br_netfilter.conf
     content: br_netfilter
   when: modinfo_br_netfilter.rc == 0
-
 
 - name: Check if bridge-nf-call-iptables key exists
   command: "sysctl net.bridge.bridge-nf-call-iptables"
@@ -64,6 +76,7 @@
     - net.bridge.bridge-nf-call-arptables
     - net.bridge.bridge-nf-call-ip6tables
     - net.bridge.bridge-nf-call-iptables
+    - net.ipv4.ip_forward
 
 - name: Use dnsmasq before falling back to dhcp provided dns
   copy:
@@ -79,6 +92,29 @@
     name: NetworkManager
     state: restarted
   when: dhclient_dns.changed
+
+- name: Change NM to use dhclient
+  copy:
+    dest: /etc/NetworkManager/conf.d/nm-dhclient.conf
+    content: |
+      [main]
+      dhcp=dhclient
+    owner: root
+    group: root
+    mode: "0644"
+  register: nm_dhclient_conf
+
+- name: Restart NetworkManager if nm-dhclient.conf changed
+  service:
+    name: NetworkManager
+    state: restarted
+  when: nm_dhclient_conf.changed
+
+- name: Restart NetworkManager if 192.168.200.2 not in nameservers
+  service:
+    name: NetworkManager
+    state: restarted
+  when: '"192.168.200.2" not in ansible_dns.nameservers'
 
 - import_tasks: install.yml
   tags:

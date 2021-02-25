@@ -3,7 +3,7 @@
   yum_repository:
     name: kubernetes
     description: Kubernetes - $basearch
-    baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el$releasever-$basearch
+    baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-$basearch
     gpgcheck: "yes"
     enabled: "yes"
     gpgkey: "https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg"
@@ -21,8 +21,23 @@
       - kubelet
       - kubeadm
       - kubectl
+      - iproute-tc
   notify:
     - kubelet status
+
+- name: Configure /tmp/kubeadmin-init.conf
+  copy:
+    dest: "/tmp/kubeadmin-init.conf"
+    content: |
+      apiVersion: kubelet.config.k8s.io/v1beta1
+      kind: KubeletConfiguration
+      cgroupDriver: systemd
+
+- name: Configure /etc/sysconfig/kubelet
+  copy:
+    dest: "/etc/sysconfig/kubelet"
+    content: |
+      KUBELET_EXTRA_ARGS=--cgroup-driver=systemd
 
 - name: Restart kubelet
   service:

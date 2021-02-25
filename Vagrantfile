@@ -37,7 +37,7 @@ Vagrant.configure("2") do |config|
   ansible_groups = {}
 
 
-  config.vm.define :lb, autostart: false do |node|
+  config.vm.define :lb, autostart: true do |node|
     node.vm.network :private_network,
       libvirt__network_name: 'kube-internal',
       libvirt__dhcp_enabled: false,
