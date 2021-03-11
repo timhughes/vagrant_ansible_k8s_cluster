@@ -22,7 +22,7 @@
     state: present
     enabled: "no"
 
-- name: Add yum repository for CRI-O
+- name: Add yum repository for CRI-O 1.20
   yum_repository:
     name: devel:kubic:libcontainers:stable:cri-o:1.20
     description: devel:kubic:libcontainers:stable:cri-o:1.20 (CentOS_8)
